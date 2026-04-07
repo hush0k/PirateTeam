@@ -14,6 +14,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - pirate-net          # ← добавить
 
   app:
     build: .
@@ -26,6 +28,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - pirate-net          # ← добавить
 
 volumes:
   postgres_data:
+
+networks:
+  pirate-net:               # ← добавить

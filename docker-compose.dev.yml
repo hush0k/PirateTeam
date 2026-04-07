@@ -6,6 +6,8 @@ services:
       - .:/app
       - maven_cache:/root/.m2
     command: mvn spring-boot:run
+    ports:
+      - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/pirate_team
       SPRING_DATASOURCE_USERNAME: user
@@ -13,6 +15,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - pirate-net          # ← добавить
 
 volumes:
   maven_cache:
+
+networks:
+  pirate-net:               # ← добавить

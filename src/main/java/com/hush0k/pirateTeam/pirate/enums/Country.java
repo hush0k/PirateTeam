@@ -22,7 +22,7 @@ public enum Country {
     SOMALIA("Somalia", "SO"),
 
     //NEAR EAST
-    TURKEY("Turkey", "TR"),
+    OTTOMAN_EMPIRE("Ottoman Empire", "OM"),
     ARABIC("Arabic", "AR");
 
     private final String name;

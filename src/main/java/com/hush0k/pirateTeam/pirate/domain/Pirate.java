@@ -4,8 +4,11 @@ import com.hush0k.pirateTeam.pirate.enums.Country;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -40,24 +43,26 @@ public class Pirate {
     int reputation;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="rank", columnDefinition = "rank_enum")
     Rank rank;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="country", columnDefinition = "country_enum")
     Country country;
 
     @Column(name="created_at")
-    LocalDate createdAt;
+    LocalDateTime createdAt;
 
     @Column(name="updated_at")
-    LocalDate updatedAt;
+    LocalDateTime updatedAt;
 
 
     @PrePersist
     public void prePersist(){
-        createdAt = LocalDate.now();
-        updatedAt = LocalDate.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
 
         if (rank == null){
             rank = Rank.CABIN_BOY;
@@ -70,6 +75,6 @@ public class Pirate {
 
     @PreUpdate
     public void preUpdate(){
-        updatedAt = LocalDate.now();
+        updatedAt = LocalDateTime.now();
     }
 }
