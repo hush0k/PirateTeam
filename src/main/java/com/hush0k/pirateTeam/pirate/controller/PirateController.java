@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ public class PirateController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Delete a pirate by ID")
+    @Operation(summary = "Delete a pirate by ID", security = @SecurityRequirement(name = "Bearer Auth"))
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Pirate deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Pirate not found")

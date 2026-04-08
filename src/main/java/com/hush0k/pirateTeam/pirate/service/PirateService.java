@@ -10,6 +10,7 @@ import com.hush0k.pirateTeam.pirate.mapper.PirateMapper;
 import com.hush0k.pirateTeam.pirate.repository.PirateRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class PirateService {
 
     private final PirateRepository pirateRepository;
     private final PirateMapper pirateMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     private Pirate getExisting(UUID pirateId) {
@@ -39,6 +41,7 @@ public class PirateService {
     public PirateResponseDto create(PirateCreateDto dto) {
         log.info("Creating new pirate with name: {}", dto.firstName());
         Pirate pirate = pirateMapper.toPirate(dto);
+        pirate.setPassword(passwordEncoder.encode(dto.password()));
         Pirate savedPirate = pirateRepository.save(pirate);
         log.info("Pirate created successfully with id: {}", savedPirate.getId());
         return pirateMapper.toPirateResponseDto(savedPirate);

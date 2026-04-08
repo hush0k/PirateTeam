@@ -13,9 +13,9 @@ import java.util.List;
 
 @Mapper( componentModel = "spring" )
 public interface PirateMapper {
-    public Pirate toPirate (PirateCreateDto dto);
-    public PirateResponseDto toPirateResponseDto (Pirate pirate);
-    public List<PirateResponseDto> toPirateAllResponseDto (List<Pirate> pirates);
+    Pirate toPirate (PirateCreateDto dto);
+    PirateResponseDto toPirateResponseDto (Pirate pirate);
+    List<PirateResponseDto> toPirateAllResponseDto (List<Pirate> pirates);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updatePirateDto(PirateUpdateDto dto, @MappingTarget Pirate pirate);

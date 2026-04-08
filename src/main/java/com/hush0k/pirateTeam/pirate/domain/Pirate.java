@@ -22,41 +22,44 @@ public class Pirate {
 
     @Id
     @GeneratedValue(strategy=GenerationType.UUID)
-    UUID id;
+    private UUID id;
+
+    @Column(name="ship_id")
+    private UUID shipId;
 
     @Column(name="login", unique = true, nullable = false)
-    String login;
+    private String login;
 
     @Column(name="first_name", nullable = false)
-    String firstName;
+    private String firstName;
 
     @Column(name="last_name", nullable = false)
-    String lastName;
+    private String lastName;
 
     @Column(name="date_of_birth", nullable = false)
-    LocalDate dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Column(name="hashed_password", nullable = false)
-    String password;
+    private  String password;
 
     @Column(name="reputation")
-    int reputation;
+    private int reputation;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="rank", columnDefinition = "rank_enum")
-    Rank rank;
+    private Rank rank;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="country", columnDefinition = "country_enum")
-    Country country;
+    private Country country;
 
     @Column(name="created_at")
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name="updated_at")
-    LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
 
     @PrePersist

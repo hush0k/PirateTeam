@@ -11,6 +11,7 @@ import java.util.UUID;
 public record PirateResponseDto(
 
         UUID id,
+        UUID shipId,
         String login,
         String firstName,
         String lastName,

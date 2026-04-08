@@ -25,6 +25,7 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
-
-
-
+jwt:
+  secret: uClrcaKGIPFVMfZfoyJMI5ipcDgBAQXRbSmHzxFfLQi
+  accessTokenExpirationTime: 86400000
+  refreshTokenExpirationTime: 2592000000

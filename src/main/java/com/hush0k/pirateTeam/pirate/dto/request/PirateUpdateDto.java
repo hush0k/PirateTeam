@@ -5,11 +5,14 @@ import com.hush0k.pirateTeam.pirate.enums.Rank;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record PirateUpdateDto(
 
         @Size(min = 3, max = 50, message = "Логин должен быть от 3 до 50 символов")
         String login,
+
+        UUID shipId,
 
         @Size(min = 3, max = 50, message = "Имя должно содержать от 3 до 50 символов")
         String firstName,
