@@ -24,7 +24,7 @@ public class Ship {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name="capitan_id")
+    @Column(name="capitan_id",  nullable = false)
     private UUID capitanId;
 
     @Column(name="name")
@@ -63,6 +63,14 @@ public class Ship {
     public void prePersist(){
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+
+        if(shipType == null){
+            shipType = ShipType.SLOOP;
+        }
+        if(builderCountry == null){
+            builderCountry = Country.SPAIN;
+        }
+
     }
 
     @PreUpdate

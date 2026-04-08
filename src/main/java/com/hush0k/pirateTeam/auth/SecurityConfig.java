@@ -37,7 +37,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.DELETE, "/api/pirates/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/pirates/**", "/api/ships/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .authenticationProvider(authenticationProvider())
