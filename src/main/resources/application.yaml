@@ -20,6 +20,11 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
