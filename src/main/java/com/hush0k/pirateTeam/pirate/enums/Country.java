@@ -1,35 +1,35 @@
-package com.hush0k.pirateTeam.pirate.enums;
+    package com.hush0k.pirateTeam.pirate.enums;
 
-import lombok.Getter;
+    import lombok.Getter;
 
-@Getter
-public enum Country {
+    @Getter
+    public enum Country {
 
-    //EUROPE
-    ENGLAND("England", "GB"),
-    SPAIN("Spain", "ES"),
-    FRANCE("France", "FR"),
-    NETHERLANDS("Netherlands", "NL"),
-    PORTUGAL("Portugal", "PT"),
+        //EUROPE
+        ENGLAND("England", "GB"),
+        SPAIN("Spain", "ES"),
+        FRANCE("France", "FR"),
+        NETHERLANDS("Netherlands", "NL"),
+        PORTUGAL("Portugal", "PT"),
 
-    //AMERICA
-    USA("United States", "US"),
-    BAHAMAS("Bahamas", "BS"),
-    HAITI("Haiti", "HT"),
+        //AMERICA
+        USA("United States", "US"),
+        BAHAMAS("Bahamas", "BS"),
+        HAITI("Haiti", "HT"),
 
-    //AFRICA
-    MOROCCO("Morocco", "MA"),
-    SOMALIA("Somalia", "SO"),
+        //AFRICA
+        MOROCCO("Morocco", "MA"),
+        SOMALIA("Somalia", "SO"),
 
-    //NEAR EAST
-    OTTOMAN_EMPIRE("Ottoman Empire", "OM"),
-    ARABIC("Arabic", "AR");
+        //NEAR EAST
+        OTTOMAN_EMPIRE("Ottoman Empire", "OM"),
+        ARABIC("Arabic", "AR");
 
-    private final String name;
-    private final String code;
+        private final String name;
+        private final String code;
 
-    Country(String name, String code) {
-        this.name = name;
-        this.code = code;
+        Country(String name, String code) {
+            this.name = name;
+            this.code = code;
+        }
     }
-}

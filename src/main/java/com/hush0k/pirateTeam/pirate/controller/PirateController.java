@@ -97,4 +97,17 @@ public class PirateController {
     ) {
         return pirateService.changeRank(id, rank);
     }
+
+    @PatchMapping("/{pirateId}/ship/{shipId}")
+    @Operation(summary = "Assign a pirate to a ship")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate assigned to ship successfully"),
+            @ApiResponse(responseCode = "404", description = "Pirate or ship not found")
+    })
+    public PirateResponseDto assignToShip(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID pirateId,
+            @Parameter(description = "Ship UUID") @PathVariable UUID shipId
+    ) {
+        return pirateService.assignToShip(pirateId, shipId);
+    }
 }

@@ -9,6 +9,8 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -24,8 +26,14 @@ public class Pirate {
     @GeneratedValue(strategy=GenerationType.UUID)
     private UUID id;
 
+    @ElementCollection
+    @CollectionTable(
+            name="pirate_ships",
+            joinColumns = @JoinColumn(name="pirate_id")
+    )
     @Column(name="ship_id")
-    private UUID shipId;
+    @Builder.Default
+    private Set<UUID> shipIds = new HashSet<>();
 
     @Column(name="login", unique = true, nullable = false)
     private String login;
