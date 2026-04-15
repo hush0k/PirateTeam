@@ -9,9 +9,6 @@ import java.util.UUID;
 
 public record ShipCreateDto(
 
-        @NotNull(message = "Captain must be specified")
-        UUID capitanId,
-
         @NotBlank(message = "Name cannot be blank")
         @Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
         String name,

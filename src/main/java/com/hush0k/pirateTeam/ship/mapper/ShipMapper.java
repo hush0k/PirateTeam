@@ -18,6 +18,8 @@ public interface ShipMapper {
     public Ship toShip(ShipCreateDto dto);
     public List<ShipResponseDto> toShipDtoList(List<Ship> ships);
 
+
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateShipDto(ShipUpdateDto dto, @MappingTarget Ship ship);
 }

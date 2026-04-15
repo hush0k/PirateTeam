@@ -24,7 +24,7 @@ public class Ship {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name="capitan_id",  nullable = false)
+    @Column(name="capitan_id")
     private UUID capitanId;
 
     @Column(name="name")

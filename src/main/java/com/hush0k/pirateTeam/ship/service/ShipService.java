@@ -1,5 +1,10 @@
 package com.hush0k.pirateTeam.ship.service;
 
+import com.hush0k.pirateTeam.exception.PirateNotCaptainException;
+import com.hush0k.pirateTeam.pirate.domain.Pirate;
+import com.hush0k.pirateTeam.pirate.enums.Rank;
+import com.hush0k.pirateTeam.ship.client.PirateFeignClient;
+import com.hush0k.pirateTeam.ship.client.dto.PirateClientDto;
 import com.hush0k.pirateTeam.ship.domain.Ship;
 import com.hush0k.pirateTeam.ship.dto.request.ShipCreateDto;
 import com.hush0k.pirateTeam.ship.dto.request.ShipUpdateDto;
@@ -23,6 +28,7 @@ public class ShipService {
 
     private final ShipRepository shipRepository;
     private final ShipMapper shipMapper;
+    private final PirateFeignClient pirateFeignClient;
 
     @Transactional(readOnly = true)
     private Ship getExisting(UUID id) {
@@ -40,6 +46,22 @@ public class ShipService {
         Ship ship = shipMapper.toShip(dto);
         Ship savedShip = shipRepository.save(ship);
         log.info("Ship created successfully with id: {}", savedShip.getId());
+        return shipMapper.toShipDto(savedShip);
+    }
+
+    public ShipResponseDto assignCaptain(UUID shipId, UUID captainId) {
+        log.info("Assigning captain {} to ship {}", captainId, shipId);
+        PirateClientDto pirate = pirateFeignClient.getPirateById(captainId);
+
+        if (pirate.rank() != Rank.CAPTAIN) {
+            throw new PirateNotCaptainException(captainId);
+        }
+
+        Ship ship = getExisting(shipId);
+        ship.setCapitanId(captainId);
+        Ship savedShip = shipRepository.save(ship);
+
+        pirateFeignClient.assignToShip(captainId, shipId);
         return shipMapper.toShipDto(savedShip);
     }
 

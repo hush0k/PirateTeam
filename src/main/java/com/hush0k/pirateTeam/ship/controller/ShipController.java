@@ -83,4 +83,18 @@ public class ShipController {
     ) {
         return shipService.findById(id);
     }
+
+    @PatchMapping("/{shipId}/capitan/{captainId}")
+    @Operation(summary = "Assign a captain to a ship")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Captain assigned successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or pirate is not a captain"),
+            @ApiResponse(responseCode = "404", description = "Ship or pirate not found")
+    })
+    public ShipResponseDto assignCaptain(
+            @Parameter(description = "Ship UUID") @PathVariable UUID shipId,
+            @Parameter(description = "Captain UUID") @PathVariable UUID captainId
+    ) {
+        return shipService.assignCaptain(shipId, captainId);
+    }
 }
