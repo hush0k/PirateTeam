@@ -6,12 +6,13 @@ import com.hush0k.pirateTeam.pirate.enums.Rank;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 public record PirateResponseDto(
 
         UUID id,
-        UUID shipId,
+        Set<UUID> shipIds,
         String login,
         String firstName,
         String lastName,
