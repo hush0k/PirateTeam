@@ -27,5 +27,21 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(TeamNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleTeamNotFoundException(
+            TeamNotFoundException e,
+            HttpServletRequest request
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        404,
+                        "Not Found",
+                        e.getMessage(),
+                        request.getRequestURI()
+                ));
+    }
+
 
 }

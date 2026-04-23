@@ -43,14 +43,14 @@ public class Team {
     @Column(name="reputation")
     private int reputation;
 
+    @Column(name="cohesion")
+    private int cohesion;
+
     @Column(name="created_at")
     private LocalDateTime createdAt;
 
     @Column(name="updated_at")
     private LocalDateTime updatedAt;
-
-    @Column(name="cohesion")
-    private int cohesion;
 
 
     @PrePersist
