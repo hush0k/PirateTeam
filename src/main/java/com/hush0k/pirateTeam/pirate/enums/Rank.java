@@ -15,7 +15,9 @@ public enum Rank {
     BOATSWAIN(9),
     NAVIGATOR(10),
     QUARTERMASTER(11),
-    CAPTAIN(12);
+    CAPTAIN(12),
+    LEGEND(13),
+    PIRATE_KING(14);
 
     private final int level;
 

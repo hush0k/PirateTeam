@@ -19,6 +19,7 @@ public record PirateResponseDto(
         LocalDate dateOfBirth,
         Rank rank,
         int reputation,
+        UUID homeIslandId,
         Country country,
 
         @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss", timezone = "Asia/Almaty")

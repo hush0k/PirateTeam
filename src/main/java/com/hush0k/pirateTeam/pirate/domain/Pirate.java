@@ -53,6 +53,9 @@ public class Pirate {
     @Column(name="reputation")
     private int reputation;
 
+    @Column(name="home_island_id")
+    private UUID homeIslandId;
+
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="rank", columnDefinition = "rank_enum")

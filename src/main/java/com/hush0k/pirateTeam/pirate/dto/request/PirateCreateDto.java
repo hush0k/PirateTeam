@@ -39,6 +39,8 @@ public record PirateCreateDto(
         @Positive(message = "Репутация не может быть отрицательной")
         int reputation,
 
+        UUID homeIslandId,
+
         @NotNull(message = "Страна должна быть указана")
         Country country
 

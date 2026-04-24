@@ -29,5 +29,7 @@ public record PirateUpdateDto(
         @Positive(message = "Репутация не может быть отрицательной")
         int reputation,
 
+        UUID homeIslandId,
+
         Country country
 ) {}
