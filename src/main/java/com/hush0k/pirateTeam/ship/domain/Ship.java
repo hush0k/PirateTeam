@@ -27,6 +27,12 @@ public class Ship {
     @Column(name="capitan_id")
     private UUID capitanId;
 
+    @Column(name="owner_id")
+    private UUID ownerId;
+
+    @Column(name="fleet_id")
+    private UUID fleetId;
+
     @Column(name="name")
     private String name;
 
@@ -37,6 +43,9 @@ public class Ship {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="ship_type", columnDefinition = "ship_type_enum")
     private ShipType shipType;
+
+    @Column(name="price")
+    private Integer price;
 
     @Column(name="max_crew")
     private int maxCrew;

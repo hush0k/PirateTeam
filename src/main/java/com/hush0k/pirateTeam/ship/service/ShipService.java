@@ -60,7 +60,6 @@ public class ShipService {
         ship.setCapitanId(captainId);
         Ship savedShip = shipRepository.save(ship);
 
-        pirateFeignClient.assignToShip(captainId, shipId);
         return shipMapper.toShipDto(savedShip);
     }
 

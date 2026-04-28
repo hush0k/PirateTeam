@@ -30,6 +30,9 @@ public record ShipCreateDto(
         Country builderCountry,
 
         @Positive(message = "Cargo capacity must be positive")
-        int cargoCapacity
+        int cargoCapacity,
+
+        @PositiveOrZero(message = "Цена не может быть отрицательной")
+        Integer price
 
 ) {}

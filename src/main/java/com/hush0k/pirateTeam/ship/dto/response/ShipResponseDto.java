@@ -11,6 +11,8 @@ import java.util.UUID;
 public record ShipResponseDto(
         UUID id,
         UUID capitanId,
+        UUID ownerId,
+        UUID fleetId,
         String name,
         LocalDate constructionDate,
         ShipType shipType,
