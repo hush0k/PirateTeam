@@ -1,6 +1,6 @@
 package com.hush0k.pirateTeam.island.service;
 
-import com.hush0k.pirateTeam.exception.IslandNotFoundException;
+import com.hush0k.pirateTeam.exception.island.IslandNotFoundException;
 import com.hush0k.pirateTeam.island.domain.Island;
 import com.hush0k.pirateTeam.island.dto.request.IslandCreateDto;
 import com.hush0k.pirateTeam.island.dto.request.IslandUpdateDto;
