@@ -9,8 +9,6 @@ import java.util.UUID;
 
 public record ShipUpdateDto(
 
-        UUID capitanId,
-
         @Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
         String name,
 
@@ -28,6 +26,9 @@ public record ShipUpdateDto(
         Country builderCountry,
 
         @Positive(message = "Cargo capacity must be positive")
-        int cargoCapacity
+        int cargoCapacity,
+
+        @PositiveOrZero(message = "Цена не может быть отрицательной")
+        Integer price
 
 ) {}

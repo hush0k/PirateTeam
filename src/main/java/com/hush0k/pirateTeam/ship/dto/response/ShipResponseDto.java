@@ -16,6 +16,7 @@ public record ShipResponseDto(
         String name,
         LocalDate constructionDate,
         ShipType shipType,
+        Integer price,
         int maxCrew,
         float maxSpeed,
         Country builderCountry,

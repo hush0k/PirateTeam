@@ -48,10 +48,10 @@ public class Ship {
     private Integer price;
 
     @Column(name="max_crew")
-    private int maxCrew;
+    private Integer maxCrew;
 
     @Column(name="max_speed")
-    private float maxSpeed;
+    private Float maxSpeed;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
@@ -59,7 +59,7 @@ public class Ship {
     private Country builderCountry;
 
     @Column(name = "cargo_capacity")
-    private int cargoCapacity;
+    private Integer cargoCapacity;
 
     @Column(name="created_at")
     private LocalDateTime createdAt;
