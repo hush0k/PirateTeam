@@ -8,7 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.UUID;
 
-@FeignClient(name="pirate-client", url="${app.base-url:http://localhost:8080}")
+@FeignClient(
+        name = "pirate-client",
+        contextId = "shipPirateClient",
+        url = "${app.base-url:http://localhost:8080}"
+)
 public interface PirateFeignClient {
 
     @GetMapping("/api/pirates/{id}")
