@@ -1,6 +1,6 @@
 services:
   app:
-    image: maven:3.9-eclipse-temurin-17
+    image: maven:3.9-eclipse-temurin-21
     working_dir: /app
     volumes:
       - .:/app
@@ -16,10 +16,10 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - pirate-net          # ← добавить
+      - pirate-net
 
 volumes:
   maven_cache:
 
 networks:
-  pirate-net:               # ← добавить
+  pirate-net:

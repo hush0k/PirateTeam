@@ -29,10 +29,10 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - pirate-net          # ← добавить
+      - pirate-net
 
 volumes:
   postgres_data:
 
 networks:
-  pirate-net:               # ← добавить
+  pirate-net:

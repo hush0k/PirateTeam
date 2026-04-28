@@ -14,6 +14,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    open-in-view: false
 
   flyway:
     enabled: true
@@ -29,6 +30,7 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
 
 jwt:
   secret: uClrcaKGIPFVMfZfoyJMI5ipcDgBAQXRbSmHzxFfLQi
