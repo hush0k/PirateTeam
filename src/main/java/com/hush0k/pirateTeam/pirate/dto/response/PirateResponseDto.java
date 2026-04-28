@@ -13,6 +13,7 @@ public record PirateResponseDto(
 
         UUID id,
         Set<UUID> shipIds,
+        UUID teamId,
         String login,
         String firstName,
         String lastName,

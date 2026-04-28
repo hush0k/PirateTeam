@@ -15,9 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -109,4 +111,29 @@ public class PirateService {
         log.info("Pirate assigned successfully with id: {}", pirateId);
         return pirateMapper.toPirateResponseDto(updatedPirate);
     }
+
+    public void assignManyToTeam(Set<UUID> pirateId, UUID teamId){
+        List<Pirate> pirates = pirateRepository.findAllById(pirateId);
+
+        if(pirates.size() != pirateId.size()){
+            Set<UUID> foundIds = pirates.stream().map(Pirate::getId).collect(Collectors.toSet());
+            Set<UUID> missing = new HashSet<>(pirateId);
+            missing.removeAll(foundIds);
+            log.info("Missing pirate ids found: {}", missing);
+            throw new PirateNotFoundException(missing.iterator().next());
+        }
+
+        pirates.forEach(pirate -> pirate.setTeamId(teamId));
+        pirateRepository.saveAll(pirates);
+        log.info("Assigned {} pirates to team {} successfully", pirates.size(), teamId);
+    }
+
+    public void removeManyFromTeam(Set<UUID> pirateIds, UUID teamId){
+        log.info("Removing {} pirates from team {}", pirateIds.size(), teamId);
+        List<Pirate> pirates = pirateRepository.findAllById(pirateIds);
+        pirates.forEach(p -> p.setTeamId(null));
+        pirateRepository.saveAll(pirates);
+        log.info("Removed {} pirates from team {} successfully", pirates.size(), teamId);
+    }
+
 }

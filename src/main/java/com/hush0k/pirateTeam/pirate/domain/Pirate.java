@@ -35,6 +35,9 @@ public class Pirate {
     @Builder.Default
     private Set<UUID> shipIds = new HashSet<>();
 
+    @Column(name="teamId")
+    private UUID teamId;
+
     @Column(name="login", unique = true, nullable = false)
     private String login;
 

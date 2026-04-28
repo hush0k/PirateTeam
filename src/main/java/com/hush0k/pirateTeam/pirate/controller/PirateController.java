@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -116,5 +117,32 @@ public class PirateController {
             @Parameter(description = "Ship UUID") @PathVariable UUID shipId
     ) {
         return pirateService.assignToShip(pirateId, shipId);
+    }
+
+    @PatchMapping("/team/{teamId}/bulk")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Assign multiple pirates to a team (batch, called by TeamService via Feign)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Pirates assigned to team successfully"),
+            @ApiResponse(responseCode = "404", description = "One or more pirates not found")
+    })
+    public void assignManyToTeam(
+            @Parameter(description = "Team UUID") @PathVariable UUID teamId,
+            @RequestBody Set<UUID> pirateIds
+    ) {
+        pirateService.assignManyToTeam(pirateIds, teamId);
+    }
+
+    @PostMapping("/team/{teamId}/bulk/remove")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Remove multiple pirates from a team (batch, called by TeamService via Feign)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Pirates removed from team successfully")
+    })
+    public void removeManyFromTeam(
+            @Parameter(description = "Team UUID") @PathVariable UUID teamId,
+            @RequestBody Set<UUID> pirateIds
+    ) {
+        pirateService.removeManyFromTeam(pirateIds, teamId);
     }
 }

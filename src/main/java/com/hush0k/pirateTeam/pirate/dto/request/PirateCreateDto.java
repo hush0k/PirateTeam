@@ -14,8 +14,6 @@ public record PirateCreateDto(
         @Size(min = 3, max = 50, message = "Логин должен быть от 3 до 50 символов")
         String login,
 
-        Set<UUID> shipIds,
-
         @NotBlank(message = "Имя обязательно для заполнения")
         @Size(min = 3, max = 50, message = "Имя должно содержать от 3 до 50 символов")
         String firstName,
@@ -35,11 +33,6 @@ public record PirateCreateDto(
                 message = "Пароль должен содержать заглавную и строчную буквы, цифру и спецсимвол (@$!%*?&_)"
         )
         String password,
-
-        @Positive(message = "Репутация не может быть отрицательной")
-        int reputation,
-
-        UUID homeIslandId,
 
         @NotNull(message = "Страна должна быть указана")
         Country country
