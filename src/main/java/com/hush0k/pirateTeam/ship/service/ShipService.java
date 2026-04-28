@@ -1,7 +1,6 @@
 package com.hush0k.pirateTeam.ship.service;
 
-import com.hush0k.pirateTeam.exception.PirateNotCaptainException;
-import com.hush0k.pirateTeam.pirate.domain.Pirate;
+import com.hush0k.pirateTeam.exception.pirate.PirateNotCaptainException;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
 import com.hush0k.pirateTeam.ship.client.PirateFeignClient;
 import com.hush0k.pirateTeam.ship.client.dto.PirateClientDto;
@@ -11,7 +10,7 @@ import com.hush0k.pirateTeam.ship.dto.request.ShipUpdateDto;
 import com.hush0k.pirateTeam.ship.dto.response.ShipResponseDto;
 import com.hush0k.pirateTeam.ship.mapper.ShipMapper;
 import com.hush0k.pirateTeam.ship.repository.ShipRepository;
-import com.hush0k.pirateTeam.exception.ShipNotFoundException;
+import com.hush0k.pirateTeam.exception.ship.ShipNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

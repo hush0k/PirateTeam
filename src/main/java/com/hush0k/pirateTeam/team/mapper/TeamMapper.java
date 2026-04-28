@@ -1,6 +1,10 @@
 package com.hush0k.pirateTeam.team.mapper;
 
+import com.hush0k.pirateTeam.pirate.domain.Pirate;
+import com.hush0k.pirateTeam.pirate.dto.request.PirateCreateDto;
 import com.hush0k.pirateTeam.team.domain.Team;
+import com.hush0k.pirateTeam.team.dto.request.TeamCreateDto;
+import com.hush0k.pirateTeam.team.dto.request.TeamUpdateDto;
 import com.hush0k.pirateTeam.team.dto.response.TeamResponseDto;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -12,9 +16,9 @@ import java.util.List;
 @Mapper( componentModel = "spring" )
 public interface TeamMapper {
     TeamResponseDto toTeamResponseDto( Team team );
-    Team toTeam( TeamResponseDto teamResponseDto );
+    Team toTeam( TeamCreateDto teamResponseDto );
     List<TeamResponseDto> toTeamResponseDto(List<Team> teams );
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateTeam( TeamResponseDto teamResponseDto, @MappingTarget Team team );
+    void updateTeam(TeamUpdateDto updateDto, @MappingTarget Team team );
 }

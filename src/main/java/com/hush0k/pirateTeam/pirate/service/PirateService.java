@@ -1,6 +1,6 @@
 package com.hush0k.pirateTeam.pirate.service;
 
-import com.hush0k.pirateTeam.exception.PirateNotFoundException;
+import com.hush0k.pirateTeam.exception.pirate.PirateNotFoundException;
 import com.hush0k.pirateTeam.pirate.client.ShipFeignClient;
 import com.hush0k.pirateTeam.pirate.domain.Pirate;
 import com.hush0k.pirateTeam.pirate.dto.request.PirateCreateDto;
@@ -30,6 +30,7 @@ public class PirateService {
     private final PasswordEncoder passwordEncoder;
     private final ShipFeignClient shipFeignClient;
 
+    // EXISTS
     @Transactional(readOnly = true)
     private Pirate getExisting(UUID pirateId) {
         log.debug("Fetching pirate with id: {}", pirateId);
@@ -41,6 +42,7 @@ public class PirateService {
         );
     }
 
+    // CREATE
     public PirateResponseDto create(PirateCreateDto dto) {
         log.info("Creating new pirate with name: {}", dto.firstName());
         Pirate pirate = pirateMapper.toPirate(dto);
@@ -50,6 +52,7 @@ public class PirateService {
         return pirateMapper.toPirateResponseDto(savedPirate);
     }
 
+    // UPDATE
     public PirateResponseDto update(PirateUpdateDto dto, UUID id) {
         log.info("Updating pirate with name: {}", dto.firstName());
         Pirate pirate = getExisting(id);
@@ -59,6 +62,7 @@ public class PirateService {
         return pirateMapper.toPirateResponseDto(updatedPirate);
     }
 
+    // DELETE
     public void delete(UUID id) {
         log.info("Deleting pirate with id: {}", id);
         Pirate pirate = getExisting(id);
@@ -66,6 +70,7 @@ public class PirateService {
         log.info("Pirate deleted successfully with id: {}", id);
     }
 
+    // GET
     @Transactional(readOnly = true)
     public PirateResponseDto findById(UUID id) {
         log.debug("Fetching pirate by id: {}", id);
@@ -81,6 +86,7 @@ public class PirateService {
         return pirateMapper.toPirateAllResponseDto(pirates);
     }
 
+    // BUSINESS LOGIC
     public PirateResponseDto changeRank(UUID id, Rank rank) {
         log.info("Changing rank for pirate with id: {} to rank: {}", id, rank);
         Pirate pirate = getExisting(id);

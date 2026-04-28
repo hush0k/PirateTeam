@@ -1,11 +1,15 @@
 package com.hush0k.pirateTeam.team.service;
 
-import com.hush0k.pirateTeam.exception.TeamNotFoundException;
+import com.hush0k.pirateTeam.exception.pirate.PirateInvalidRankException;
+import com.hush0k.pirateTeam.exception.team.InsufficientTreasuryException;
+import com.hush0k.pirateTeam.exception.team.PirateAlreadyInTeamException;
+import com.hush0k.pirateTeam.exception.team.PirateNotInTeamException;
+import com.hush0k.pirateTeam.exception.team.TeamNotFoundException;
+import com.hush0k.pirateTeam.pirate.enums.Rank;
+import com.hush0k.pirateTeam.team.client.PirateFeignClient;
+import com.hush0k.pirateTeam.team.client.dto.CaptainClientDto;
 import com.hush0k.pirateTeam.team.domain.Team;
-import com.hush0k.pirateTeam.team.dto.request.TeamCreateDto;
-import com.hush0k.pirateTeam.team.dto.request.TeamReputationChangeDto;
-import com.hush0k.pirateTeam.team.dto.request.TeamTreasuryChangeDto;
-import com.hush0k.pirateTeam.team.dto.request.TeamUpdateDto;
+import com.hush0k.pirateTeam.team.dto.request.*;
 import com.hush0k.pirateTeam.team.dto.response.TeamResponseDto;
 import com.hush0k.pirateTeam.team.mapper.TeamMapper;
 import com.hush0k.pirateTeam.team.repository.TeamRepository;
@@ -29,6 +33,7 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final TeamMapper teamMapper;
+    private final PirateFeignClient pirateFeignClient;
 
     @Transactional(readOnly = true)
     private Team getExisting(UUID id) {
@@ -48,14 +53,14 @@ public class TeamService {
 
     public TeamResponseDto create(TeamCreateDto dto) {
         log.info("Creating new team with name: {}", dto.name());
-        Team team = Team.builder()
-                .name(dto.name())
-                .capitanId(dto.capitanId())
-                .pirateIds(toPirateIds(dto.pirateIds()))
-                .treasury(dto.treasury())
-                .reputation(dto.reputation())
-                .cohesion(dto.cohesion())
-                .build();
+        Team team = teamMapper.toTeam(dto);
+
+        CaptainClientDto capitan = pirateFeignClient.getPirateById(dto.capitanId());
+        if (!capitan.rank().isHigherThan(Rank.COOK)) {
+            log.warn("Captain with id: {} has invalid rank: {}", dto.capitanId(), capitan.rank());
+            throw new PirateInvalidRankException(dto.capitanId());
+        }
+
         Team savedTeam = teamRepository.save(team);
         log.info("Team created successfully with id: {}", savedTeam.getId());
         return teamMapper.toTeamResponseDto(savedTeam);
@@ -64,19 +69,7 @@ public class TeamService {
     public TeamResponseDto update(TeamUpdateDto dto, UUID id) {
         log.info("Updating team with id: {}", id);
         Team team = getExisting(id);
-
-        if (dto.name() != null) {
-            team.setName(dto.name());
-        }
-
-        if (dto.capitanId() != null) {
-            team.setCapitanId(dto.capitanId());
-        }
-
-        if (dto.pirateIds() != null) {
-            team.setPirateIds(toPirateIds(dto.pirateIds()));
-        }
-
+        teamMapper.updateTeam(dto, team);
         Team updatedTeam = teamRepository.save(team);
         log.info("Team updated successfully with id: {}", id);
         return teamMapper.toTeamResponseDto(updatedTeam);
@@ -104,29 +97,96 @@ public class TeamService {
         return teamMapper.toTeamResponseDto(teams);
     }
 
-    public TeamResponseDto changeTreasury(UUID id, TeamTreasuryChangeDto dto) {
-        log.info("Changing treasury for team with id: {}", id);
+    // Treasury business-logic
+    public TeamResponseDto addTreasury(UUID id, TeamTreasuryChangeDto dto) {
         Team team = getExisting(id);
-        team.setTreasury(dto.treasury());
+        team.setTreasury(team.getTreasury() + dto.amount());
         Team updatedTeam = teamRepository.save(team);
-        log.info("Team treasury changed successfully with id: {}", id);
+        log.info("Team with id: {} added {} treasury successfully", id, dto.amount());
         return teamMapper.toTeamResponseDto(updatedTeam);
     }
 
-    public TeamResponseDto changeReputation(UUID id, TeamReputationChangeDto dto) {
-        log.info("Changing reputation for team with id: {}", id);
+    public TeamResponseDto withdrawTreasury(UUID id, TeamTreasuryChangeDto dto) {
         Team team = getExisting(id);
-        team.setReputation(dto.reputation());
-        Team updatedTeam = teamRepository.save(team);
-        log.info("Team reputation changed successfully with id: {}", id);
-        return teamMapper.toTeamResponseDto(updatedTeam);
-    }
 
-    private Set<UUID> toPirateIds(Set<UUID> pirateIds) {
-        if (pirateIds == null) {
-            return new HashSet<>();
+        if (team.getTreasury() < dto.amount()) {
+            log.warn("Team with id: {} has insufficient treasury for loss of {}", id, dto.amount());
+            throw new InsufficientTreasuryException(id);
         }
 
-        return new HashSet<>(pirateIds);
+        team.setTreasury(team.getTreasury() - dto.amount());
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team with id: {} spent {} treasury successfully", id, dto.amount());
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    //Reputation business-logic
+    public TeamResponseDto addReputation(UUID id, TeamReputationChangeDto dto) {
+        Team team = getExisting(id);
+        team.setReputation(team.getReputation() + dto.reputation());
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team with id: {} added {} reputation successfully", id, dto.reputation());
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto reduceReputation(UUID id, TeamReputationChangeDto dto) {
+        Team team = getExisting(id);
+
+        if  (team.getReputation() < dto.reputation()) {
+            team.setReputation(0);
+        } else {
+            team.setReputation(team.getReputation() - dto.reputation());
+        }
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team with id: {} reduced {} reputation successfully", id, dto.reputation());
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+
+    public TeamResponseDto addNewPirate(UUID id, TeamMembersChangeDto dto) {
+        Team team = getExisting(id);
+
+        Set<UUID> pirateIds = new HashSet<>(team.getPirateIds());
+        Set<UUID> alreadyInTeam = findExistingPirateIds(pirateIds, dto.pirates());
+        if (!alreadyInTeam.isEmpty()) {
+            log.warn("Team with id: {} already contains pirates: {}", id, alreadyInTeam);
+            throw new PirateAlreadyInTeamException(id, alreadyInTeam);
+        }
+
+        pirateIds.addAll(dto.pirates());
+
+        team.setPirateIds(pirateIds);
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team with id: {} added new pirates successfully: {}", id, dto.pirates());
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto removePirate(UUID id, TeamMembersChangeDto dto) {
+        Team team = getExisting(id);
+
+        Set<UUID> pirateIds = new HashSet<>(team.getPirateIds());
+        Set<UUID> missingPirates = findMissingPirateIds(pirateIds, dto.pirates());
+        if (!missingPirates.isEmpty()) {
+            log.warn("Team with id: {} does not contain pirates: {}", id, missingPirates);
+            throw new PirateNotInTeamException(id, missingPirates);
+        }
+
+        pirateIds.removeAll(dto.pirates());
+        team.setPirateIds(pirateIds);
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team with id: {} removed pirates successfully: {}", id, dto.pirates());
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    private Set<UUID> findExistingPirateIds(Set<UUID> teamPirateIds, Set<UUID> requestedPirateIds) {
+        Set<UUID> existingPirateIds = new HashSet<>(requestedPirateIds);
+        existingPirateIds.retainAll(teamPirateIds);
+        return existingPirateIds;
+    }
+
+    private Set<UUID> findMissingPirateIds(Set<UUID> teamPirateIds, Set<UUID> requestedPirateIds) {
+        Set<UUID> missingPirateIds = new HashSet<>(requestedPirateIds);
+        missingPirateIds.removeAll(teamPirateIds);
+        return missingPirateIds;
     }
 }

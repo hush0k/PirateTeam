@@ -86,31 +86,65 @@ public class TeamController {
         return teamService.findById(id);
     }
 
-    @PatchMapping("/{id}/treasury")
-    @Operation(summary = "Change team treasury")
+    @PatchMapping("/{id}/treasury/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add treasure to team treasury")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Team treasury changed"),
+            @ApiResponse(responseCode = "200", description = "Team treasury increased successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "404", description = "Team not found")
     })
-    public TeamResponseDto changeTreasury(
+    public TeamResponseDto addTreasury(
             @Parameter(description = "Team UUID") @PathVariable UUID id,
             @Valid @RequestBody TeamTreasuryChangeDto dto
     ) {
-        return teamService.changeTreasury(id, dto);
+        return teamService.addTreasury(id, dto);
     }
 
-    @PatchMapping("/{id}/reputation")
-    @Operation(summary = "Change team reputation")
+    @PatchMapping("/{id}/treasury/withdraw")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Withdraw treasure from team treasury")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Team reputation changed"),
+            @ApiResponse(responseCode = "200", description = "Team treasury reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or insufficient treasury"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto withdrawTreasury(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamTreasuryChangeDto dto
+    ) {
+        return teamService.withdrawTreasury(id, dto);
+    }
+
+    @PatchMapping("/{id}/reputation/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add reputation to team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team reputation increased successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data"),
             @ApiResponse(responseCode = "404", description = "Team not found")
     })
-    public TeamResponseDto changeReputation(
+    public TeamResponseDto addReputation(
             @Parameter(description = "Team UUID") @PathVariable UUID id,
             @Valid @RequestBody TeamReputationChangeDto dto
     ) {
-        return teamService.changeReputation(id, dto);
+        return teamService.addReputation(id, dto);
     }
+
+    @PatchMapping("/{id}/reputation/reduce")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Reduce team reputation")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team reputation reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto reduceReputation(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamReputationChangeDto dto
+    ) {
+        return teamService.reduceReputation(id, dto);
+    }
+
+
 }

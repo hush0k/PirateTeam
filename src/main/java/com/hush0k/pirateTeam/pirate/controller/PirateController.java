@@ -27,6 +27,7 @@ public class PirateController {
 
     private final PirateService pirateService;
 
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new pirate")
@@ -37,6 +38,7 @@ public class PirateController {
     public PirateResponseDto create(@Valid @RequestBody PirateCreateDto dto) {
         return pirateService.create(dto);
     }
+
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -53,6 +55,7 @@ public class PirateController {
         return pirateService.update(dto, id);
     }
 
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a pirate by ID", security = @SecurityRequirement(name = "Bearer Auth"))
@@ -66,12 +69,14 @@ public class PirateController {
         pirateService.delete(id);
     }
 
+
     @GetMapping
     @Operation(summary = "Get all pirates")
     @ApiResponse(responseCode = "200", description = "List of all pirates")
     public List<PirateResponseDto> getAll() {
         return pirateService.getAll();
     }
+
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a pirate by ID")
@@ -85,6 +90,7 @@ public class PirateController {
         return pirateService.findById(id);
     }
 
+
     @PatchMapping("/{id}/rank")
     @Operation(summary = "Change rank of pirate")
     @ApiResponses({
@@ -97,6 +103,7 @@ public class PirateController {
     ) {
         return pirateService.changeRank(id, rank);
     }
+
 
     @PatchMapping("/{pirateId}/ship/{shipId}")
     @Operation(summary = "Assign a pirate to a ship")
