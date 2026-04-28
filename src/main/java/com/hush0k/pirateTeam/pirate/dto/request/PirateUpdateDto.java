@@ -1,19 +1,14 @@
 package com.hush0k.pirateTeam.pirate.dto.request;
 
 import com.hush0k.pirateTeam.pirate.enums.Country;
-import com.hush0k.pirateTeam.pirate.enums.Rank;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
-import java.util.Set;
-import java.util.UUID;
 
 public record PirateUpdateDto(
 
         @Size(min = 3, max = 50, message = "Логин должен быть от 3 до 50 символов")
         String login,
-
-        Set<UUID> shipIds,
 
         @Size(min = 3, max = 50, message = "Имя должно содержать от 3 до 50 символов")
         String firstName,
@@ -23,13 +18,6 @@ public record PirateUpdateDto(
 
         @Past(message = "Дата рождения должна быть в прошлом")
         LocalDate dateOfBirth,
-
-        Rank rank,
-
-        @Positive(message = "Репутация не может быть отрицательной")
-        int reputation,
-
-        UUID homeIslandId,
 
         Country country
 ) {}

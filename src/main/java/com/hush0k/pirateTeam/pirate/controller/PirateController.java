@@ -1,6 +1,7 @@
 package com.hush0k.pirateTeam.pirate.controller;
 
 import com.hush0k.pirateTeam.pirate.dto.request.PirateCreateDto;
+import com.hush0k.pirateTeam.pirate.dto.request.PirateReputationChange;
 import com.hush0k.pirateTeam.pirate.dto.request.PirateUpdateDto;
 import com.hush0k.pirateTeam.pirate.dto.response.PirateResponseDto;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
@@ -105,19 +106,36 @@ public class PirateController {
         return pirateService.changeRank(id, rank);
     }
 
-
-    @PatchMapping("/{pirateId}/ship/{shipId}")
-    @Operation(summary = "Assign a pirate to a ship")
+    @PatchMapping("/{id}/reputation/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add reputation to pirate")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Pirate assigned to ship successfully"),
-            @ApiResponse(responseCode = "404", description = "Pirate or ship not found")
+            @ApiResponse(responseCode = "200", description = "Pirate reputation increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
     })
-    public PirateResponseDto assignToShip(
-            @Parameter(description = "Pirate UUID") @PathVariable UUID pirateId,
-            @Parameter(description = "Ship UUID") @PathVariable UUID shipId
+    public PirateResponseDto addReputation(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateReputationChange dto
     ) {
-        return pirateService.assignToShip(pirateId, shipId);
+        return pirateService.addReputation(id, dto);
     }
+
+    @PatchMapping("/{id}/reputation/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove reputation from pirate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate reputation reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto removeReputation(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateReputationChange dto
+    ) {
+        return pirateService.removeReputation(id, dto);
+    }
+
 
     @PatchMapping("/team/{teamId}/bulk")
     @ResponseStatus(HttpStatus.NO_CONTENT)

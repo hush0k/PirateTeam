@@ -1,9 +1,9 @@
 package com.hush0k.pirateTeam.pirate.service;
 
 import com.hush0k.pirateTeam.exception.pirate.PirateNotFoundException;
-import com.hush0k.pirateTeam.pirate.client.ShipFeignClient;
 import com.hush0k.pirateTeam.pirate.domain.Pirate;
 import com.hush0k.pirateTeam.pirate.dto.request.PirateCreateDto;
+import com.hush0k.pirateTeam.pirate.dto.request.PirateReputationChange;
 import com.hush0k.pirateTeam.pirate.dto.request.PirateUpdateDto;
 import com.hush0k.pirateTeam.pirate.dto.response.PirateResponseDto;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
@@ -30,7 +30,6 @@ public class PirateService {
     private final PirateRepository pirateRepository;
     private final PirateMapper pirateMapper;
     private final PasswordEncoder passwordEncoder;
-    private final ShipFeignClient shipFeignClient;
 
     // EXISTS
     @Transactional(readOnly = true)
@@ -99,19 +98,6 @@ public class PirateService {
         return pirateMapper.toPirateResponseDto(updatedPirate);
     }
 
-    public PirateResponseDto assignToShip(UUID pirateId, UUID shipId) {
-        log.info("Assigning pirate {} to ship {}", pirateId, shipId);
-        Pirate pirate = getExisting(pirateId);
-        shipFeignClient.getShipById(shipId); // Ensure ship exists
-
-        Set<UUID> shipIds = pirate.getShipIds();
-        shipIds.add(shipId);
-        pirate.setShipIds(shipIds);
-        Pirate updatedPirate = pirateRepository.save(pirate);
-        log.info("Pirate assigned successfully with id: {}", pirateId);
-        return pirateMapper.toPirateResponseDto(updatedPirate);
-    }
-
     public void assignManyToTeam(Set<UUID> pirateId, UUID teamId){
         List<Pirate> pirates = pirateRepository.findAllById(pirateId);
 
@@ -134,6 +120,25 @@ public class PirateService {
         pirates.forEach(p -> p.setTeamId(null));
         pirateRepository.saveAll(pirates);
         log.info("Removed {} pirates from team {} successfully", pirates.size(), teamId);
+    }
+
+
+    public PirateResponseDto addReputation(UUID id, PirateReputationChange dto) {
+        log.info("Adding reputation {} to pirate with id: {}", dto.reputation(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setReputation(pirate.getReputation() + dto.reputation());
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate reputation changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto removeReputation(UUID id, PirateReputationChange dto) {
+        log.info("Removing reputation {} from team {}", dto.reputation(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setReputation(Math.max(0, pirate.getReputation() - dto.reputation()));
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate reputation changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
     }
 
 }
