@@ -1,4 +1,4 @@
-package com.hush0k.pirateTeam.exception;
+package com.hush0k.pirateTeam.exception.island;
 
 import java.util.UUID;
 

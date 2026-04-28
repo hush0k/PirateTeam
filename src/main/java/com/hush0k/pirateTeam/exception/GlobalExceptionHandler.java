@@ -1,12 +1,25 @@
 package com.hush0k.pirateTeam.exception;
 
+import com.hush0k.pirateTeam.exception.island.IslandNotFoundException;
+import com.hush0k.pirateTeam.exception.pirate.PirateInvalidRankException;
+import com.hush0k.pirateTeam.exception.pirate.PirateNotCaptainException;
+import com.hush0k.pirateTeam.exception.pirate.PirateNotFoundException;
+import com.hush0k.pirateTeam.exception.ship.ShipNotFoundException;
+import com.hush0k.pirateTeam.exception.team.PirateAlreadyInTeamException;
+import com.hush0k.pirateTeam.exception.team.InsufficientTreasuryException;
+import com.hush0k.pirateTeam.exception.team.PirateNotInTeamException;
+import com.hush0k.pirateTeam.exception.team.TeamNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -16,15 +29,7 @@ public class GlobalExceptionHandler {
             PirateNotFoundException e,
             HttpServletRequest request
     ) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(
-                        LocalDateTime.now(),
-                        404,
-                        "Not Found",
-                        e.getMessage(),
-                        request.getRequestURI()
-                ));
+        return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
 
     @ExceptionHandler(TeamNotFoundException.class)
@@ -32,15 +37,7 @@ public class GlobalExceptionHandler {
             TeamNotFoundException e,
             HttpServletRequest request
     ) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(
-                        LocalDateTime.now(),
-                        404,
-                        "Not Found",
-                        e.getMessage(),
-                        request.getRequestURI()
-                ));
+        return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
 
     @ExceptionHandler(IslandNotFoundException.class)
@@ -48,15 +45,96 @@ public class GlobalExceptionHandler {
             IslandNotFoundException e,
             HttpServletRequest request
     ) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(ShipNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleShipNotFoundException(
+            ShipNotFoundException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(PirateInvalidRankException.class)
+    public ResponseEntity<ErrorResponse> handlePirateInvalidRankException(
+            PirateInvalidRankException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(PirateNotCaptainException.class)
+    public ResponseEntity<ErrorResponse> handlePirateNotCaptainException(
+            PirateNotCaptainException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(InsufficientTreasuryException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientTreasuryException(
+            InsufficientTreasuryException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(PirateNotInTeamException.class)
+    public ResponseEntity<ErrorResponse> handlePirateNotInTeamException(
+            PirateNotInTeamException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(PirateAlreadyInTeamException.class)
+    public ResponseEntity<ErrorResponse> handlePirateAlreadyInTeamException(
+            PirateAlreadyInTeamException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+            HttpMessageNotReadableException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Invalid JSON request body", request);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException e,
+            HttpServletRequest request
+    ) {
+        String message = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("; "));
+
+        if (message.isBlank()) {
+            message = "Validation failed";
+        }
+
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, message, request);
+    }
+
+    private ResponseEntity<ErrorResponse> buildErrorResponse(
+            HttpStatus status,
+            String message,
+            HttpServletRequest request
+    ) {
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(status)
                 .body(new ErrorResponse(
                         LocalDateTime.now(),
-                        404,
-                        "Not Found",
-                        e.getMessage(),
+                        status.value(),
+                        status.getReasonPhrase(),
+                        message,
                         request.getRequestURI()
                 ));
     }
-
 }
