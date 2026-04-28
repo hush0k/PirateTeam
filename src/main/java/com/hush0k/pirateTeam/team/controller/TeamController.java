@@ -1,9 +1,6 @@
 package com.hush0k.pirateTeam.team.controller;
 
-import com.hush0k.pirateTeam.team.dto.request.TeamCreateDto;
-import com.hush0k.pirateTeam.team.dto.request.TeamReputationChangeDto;
-import com.hush0k.pirateTeam.team.dto.request.TeamTreasuryChangeDto;
-import com.hush0k.pirateTeam.team.dto.request.TeamUpdateDto;
+import com.hush0k.pirateTeam.team.dto.request.*;
 import com.hush0k.pirateTeam.team.dto.response.TeamResponseDto;
 import com.hush0k.pirateTeam.team.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -145,6 +142,37 @@ public class TeamController {
     ) {
         return teamService.reduceReputation(id, dto);
     }
+
+    @PatchMapping("/{id}/pirates/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add new pirates to the team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirates added to the team successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or pirates already in team"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto addPirate(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamMembersChangeDto dto
+    ) {
+        return teamService.addNewPirate(id, dto);
+    }
+
+    @PatchMapping("/{id}/pirates/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove pirates from the team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirates removed from the team successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or pirates are not in team"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto removePirate(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamMembersChangeDto dto
+    ) {
+        return teamService.removePirate(id, dto);
+    }
+
 
 
 }
