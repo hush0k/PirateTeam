@@ -5,10 +5,7 @@ import com.hush0k.pirateTeam.exception.pirate.PirateInvalidRankException;
 import com.hush0k.pirateTeam.exception.pirate.PirateNotCaptainException;
 import com.hush0k.pirateTeam.exception.pirate.PirateNotFoundException;
 import com.hush0k.pirateTeam.exception.ship.ShipNotFoundException;
-import com.hush0k.pirateTeam.exception.team.PirateAlreadyInTeamException;
-import com.hush0k.pirateTeam.exception.team.InsufficientTreasuryException;
-import com.hush0k.pirateTeam.exception.team.PirateNotInTeamException;
-import com.hush0k.pirateTeam.exception.team.TeamNotFoundException;
+import com.hush0k.pirateTeam.exception.team.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -136,5 +133,13 @@ public class GlobalExceptionHandler {
                         message,
                         request.getRequestURI()
                 ));
+    }
+
+    @ExceptionHandler(CannotRemoveCaptainException.class)
+    public ResponseEntity<ErrorResponse> handleCannotRemoveCaptainException(
+            CannotRemoveCaptainException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 }

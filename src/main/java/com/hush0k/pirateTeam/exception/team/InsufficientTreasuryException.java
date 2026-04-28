@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public class InsufficientTreasuryException extends RuntimeException {
     public InsufficientTreasuryException(UUID id) {
-        super("Team with id " + id + " has insufficient treasury");
+        super("У команды с ID: " + id + " не достаточно золота");
 
     }
 }

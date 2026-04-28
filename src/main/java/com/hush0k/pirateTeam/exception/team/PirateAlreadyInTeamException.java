@@ -5,6 +5,6 @@ import java.util.UUID;
 
 public class PirateAlreadyInTeamException extends RuntimeException {
     public PirateAlreadyInTeamException(UUID teamId, Set<UUID> pirateIds) {
-        super("Pirates with ids " + pirateIds + " are already in team with id " + teamId);
+        super("Пираты с ID: " + pirateIds + " уже в этой команде " + teamId);
     }
 }

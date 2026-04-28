@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public class ShipNotFoundException extends RuntimeException {
     public ShipNotFoundException(UUID id) {
-        super("Ship with id " + id + " not found");
+        super("Корабль с такой ID: " + id + " не существует");
     }
 }

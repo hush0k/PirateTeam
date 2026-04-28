@@ -4,6 +4,6 @@ import java.util.UUID;
 
 public class PirateInvalidRankException extends RuntimeException {
     public PirateInvalidRankException(UUID id) {
-        super("Pirate with id " + id + " has unprohibited rank");
+        super("Пират с такой ID: " + id + " имеет недопустимый ранг");
     }
 }

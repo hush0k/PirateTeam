@@ -5,6 +5,6 @@ import java.util.UUID;
 
 public class PirateNotInTeamException extends RuntimeException {
     public PirateNotInTeamException(UUID teamId, Set<UUID> pirateIds) {
-        super("Pirates with ids " + pirateIds + " are not in team with id " + teamId);
+        super("Пираты с этой ID: " + pirateIds + " нет в этой команде " + teamId);
     }
 }
