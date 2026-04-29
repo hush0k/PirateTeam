@@ -1,8 +1,6 @@
 package com.hush0k.pirateTeam.pirate.controller;
 
-import com.hush0k.pirateTeam.pirate.dto.request.PirateCreateDto;
-import com.hush0k.pirateTeam.pirate.dto.request.PirateReputationChange;
-import com.hush0k.pirateTeam.pirate.dto.request.PirateUpdateDto;
+import com.hush0k.pirateTeam.pirate.dto.request.*;
 import com.hush0k.pirateTeam.pirate.dto.response.PirateResponseDto;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
 import com.hush0k.pirateTeam.pirate.service.PirateService;
@@ -134,6 +132,126 @@ public class PirateController {
             @Valid @RequestBody PirateReputationChange dto
     ) {
         return pirateService.removeReputation(id, dto);
+    }
+
+    @PatchMapping("/{id}/treasury/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add gold to pirate treasury")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate treasury increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto addTreasury(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateTreasuryChangeDto dto
+    ) {
+        return pirateService.addTreasury(id, dto);
+    }
+
+    @PatchMapping("/{id}/treasury/withdraw")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Withdraw gold from pirate treasury")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate treasury reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or insufficient treasury"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto withdrawTreasury(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateTreasuryChangeDto dto
+    ) {
+        return pirateService.withdrawTreasury(id, dto);
+    }
+
+    @PatchMapping("/{id}/bloodlust/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add bloodlust to pirate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate bloodlust increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto addBloodlust(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateBloodlustChangeDto dto
+    ) {
+        return pirateService.addBloodlust(id, dto);
+    }
+
+    @PatchMapping("/{id}/bloodlust/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove bloodlust from pirate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate bloodlust reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto removeBloodlust(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateBloodlustChangeDto dto
+    ) {
+        return pirateService.removeBloodlust(id, dto);
+    }
+
+    @PatchMapping("/{id}/intelligence/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add intelligence to pirate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate intelligence increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto addIntelligence(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateIntelligenceChangeDto dto
+    ) {
+        return pirateService.addIntelligence(id, dto);
+    }
+
+    @PatchMapping("/{id}/intelligence/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove intelligence from pirate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate intelligence reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto removeIntelligence(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateIntelligenceChangeDto dto
+    ) {
+        return pirateService.removeIntelligence(id, dto);
+    }
+
+    @PatchMapping("/{id}/strength/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add strength to pirate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate strength increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto addStrength(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateStrengthChangeDto dto
+    ) {
+        return pirateService.addStrength(id, dto);
+    }
+
+    @PatchMapping("/{id}/strength/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove strength from pirate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate strength reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto removeStrength(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateStrengthChangeDto dto
+    ) {
+        return pirateService.removeStrength(id, dto);
     }
 
 

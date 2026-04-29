@@ -18,6 +18,10 @@ public record PirateResponseDto(
         LocalDate dateOfBirth,
         Rank rank,
         int reputation,
+        int treasury,
+        int bloodlust,
+        int intelligence,
+        int strength,
         UUID homeIslandId,
         Country country,
 

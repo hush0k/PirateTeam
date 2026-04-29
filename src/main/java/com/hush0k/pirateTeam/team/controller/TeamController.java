@@ -173,6 +173,154 @@ public class TeamController {
         return teamService.removePirate(id, dto);
     }
 
+    @PatchMapping("/{id}/morale/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add morale to team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team morale increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto addMorale(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamMoraleChangeDto dto
+    ) {
+        return teamService.addMorale(id, dto);
+    }
 
+    @PatchMapping("/{id}/morale/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove morale from team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team morale reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto removeMorale(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamMoraleChangeDto dto
+    ) {
+        return teamService.removeMorale(id, dto);
+    }
+
+    @PatchMapping("/{id}/loyalty/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add loyalty to team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team loyalty increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto addLoyalty(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamLoyaltyChangeDto dto
+    ) {
+        return teamService.addLoyalty(id, dto);
+    }
+
+    @PatchMapping("/{id}/loyalty/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove loyalty from team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team loyalty reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto removeLoyalty(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamLoyaltyChangeDto dto
+    ) {
+        return teamService.removeLoyalty(id, dto);
+    }
+
+    @PatchMapping("/{id}/loot-bonus/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add loot bonus to team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team loot bonus increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto addLootBonus(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamLootBonusChangeDto dto
+    ) {
+        return teamService.addLootBonus(id, dto);
+    }
+
+    @PatchMapping("/{id}/loot-bonus/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove loot bonus from team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team loot bonus reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto removeLootBonus(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamLootBonusChangeDto dto
+    ) {
+        return teamService.removeLootBonus(id, dto);
+    }
+
+    @PatchMapping("/{id}/power/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add power to team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team power increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto addPower(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamPowerChangeDto dto
+    ) {
+        return teamService.addPower(id, dto);
+    }
+
+    @PatchMapping("/{id}/power/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove power from team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team power reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto removePower(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamPowerChangeDto dto
+    ) {
+        return teamService.removePower(id, dto);
+    }
+
+    @PatchMapping("/{id}/fatigue/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add fatigue to team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team fatigue increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto addFatigue(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamFatigueChangeDto dto
+    ) {
+        return teamService.addFatigue(id, dto);
+    }
+
+    @PatchMapping("/{id}/fatigue/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove fatigue from team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team fatigue reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto removeFatigue(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Valid @RequestBody TeamFatigueChangeDto dto
+    ) {
+        return teamService.removeFatigue(id, dto);
+    }
 
 }

@@ -1,10 +1,9 @@
 package com.hush0k.pirateTeam.pirate.service;
 
+import com.hush0k.pirateTeam.exception.pirate.InsufficientPirateTreasuryException;
 import com.hush0k.pirateTeam.exception.pirate.PirateNotFoundException;
 import com.hush0k.pirateTeam.pirate.domain.Pirate;
-import com.hush0k.pirateTeam.pirate.dto.request.PirateCreateDto;
-import com.hush0k.pirateTeam.pirate.dto.request.PirateReputationChange;
-import com.hush0k.pirateTeam.pirate.dto.request.PirateUpdateDto;
+import com.hush0k.pirateTeam.pirate.dto.request.*;
 import com.hush0k.pirateTeam.pirate.dto.response.PirateResponseDto;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
 import com.hush0k.pirateTeam.pirate.mapper.PirateMapper;
@@ -138,6 +137,82 @@ public class PirateService {
         pirate.setReputation(Math.max(0, pirate.getReputation() - dto.reputation()));
         Pirate updatedPirate = pirateRepository.save(pirate);
         log.info("Pirate reputation changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto addTreasury(UUID id, PirateTreasuryChangeDto dto) {
+        log.info("Adding {} treasury to pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setTreasury(pirate.getTreasury() + dto.amount());
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate treasury changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto withdrawTreasury(UUID id, PirateTreasuryChangeDto dto) {
+        log.info("Withdrawing {} treasury from pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        if (pirate.getTreasury() < dto.amount()) {
+            log.warn("Pirate with id: {} has insufficient treasury for withdraw of {}", id, dto.amount());
+            throw new InsufficientPirateTreasuryException(id);
+        }
+        pirate.setTreasury(pirate.getTreasury() - dto.amount());
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate treasury changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto addBloodlust(UUID id, PirateBloodlustChangeDto dto) {
+        log.info("Adding {} bloodlust to pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setBloodlust(pirate.getBloodlust() + dto.amount());
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate bloodlust changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto removeBloodlust(UUID id, PirateBloodlustChangeDto dto) {
+        log.info("Removing {} bloodlust from pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setBloodlust(Math.max(0, pirate.getBloodlust() - dto.amount()));
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate bloodlust changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto addIntelligence(UUID id, PirateIntelligenceChangeDto dto) {
+        log.info("Adding {} intelligence to pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setIntelligence(pirate.getIntelligence() + dto.amount());
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate intelligence changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto removeIntelligence(UUID id, PirateIntelligenceChangeDto dto) {
+        log.info("Removing {} intelligence from pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setIntelligence(Math.max(0, pirate.getIntelligence() - dto.amount()));
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate intelligence changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto addStrength(UUID id, PirateStrengthChangeDto dto) {
+        log.info("Adding {} strength to pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setStrength(pirate.getStrength() + dto.amount());
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate strength changed successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto removeStrength(UUID id, PirateStrengthChangeDto dto) {
+        log.info("Removing {} strength from pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setStrength(Math.max(0, pirate.getStrength() - dto.amount()));
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate strength changed successfully for pirate id: {}", id);
         return pirateMapper.toPirateResponseDto(updatedPirate);
     }
 

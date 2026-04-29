@@ -201,4 +201,94 @@ public class TeamService {
         missingPirateIds.removeAll(teamPirateIds);
         return missingPirateIds;
     }
+
+    public TeamResponseDto addMorale(UUID id, TeamMoraleChangeDto dto) {
+        log.info("Adding {} morale to team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setMorale(team.getMorale() + dto.amount());
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team morale changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto removeMorale(UUID id, TeamMoraleChangeDto dto) {
+        log.info("Removing {} morale from team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setMorale(Math.max(0, team.getMorale() - dto.amount()));
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team morale changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto addLoyalty(UUID id, TeamLoyaltyChangeDto dto) {
+        log.info("Adding {} loyalty to team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setLoyalty(team.getLoyalty() + dto.amount());
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team loyalty changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto removeLoyalty(UUID id, TeamLoyaltyChangeDto dto) {
+        log.info("Removing {} loyalty from team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setLoyalty(Math.max(0, team.getLoyalty() - dto.amount()));
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team loyalty changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto addLootBonus(UUID id, TeamLootBonusChangeDto dto) {
+        log.info("Adding {} lootBonus to team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setLootBonus(team.getLootBonus() + dto.amount());
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team lootBonus changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto removeLootBonus(UUID id, TeamLootBonusChangeDto dto) {
+        log.info("Removing {} lootBonus from team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setLootBonus(Math.max(0, team.getLootBonus() - dto.amount()));
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team lootBonus changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto addPower(UUID id, TeamPowerChangeDto dto) {
+        log.info("Adding {} power to team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setPower(team.getPower() + dto.amount());
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team power changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto removePower(UUID id, TeamPowerChangeDto dto) {
+        log.info("Removing {} power from team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setPower(Math.max(0, team.getPower() - dto.amount()));
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team power changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto addFatigue(UUID id, TeamFatigueChangeDto dto) {
+        log.info("Adding {} fatigue to team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setFatigue(team.getFatigue() + dto.amount());
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team fatigue changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
+
+    public TeamResponseDto removeFatigue(UUID id, TeamFatigueChangeDto dto) {
+        log.info("Removing {} fatigue from team {}", dto.amount(), id);
+        Team team = getExisting(id);
+        team.setFatigue(Math.max(0, team.getFatigue() - dto.amount()));
+        Team updatedTeam = teamRepository.save(team);
+        log.info("Team fatigue changed successfully for team id: {}", id);
+        return teamMapper.toTeamResponseDto(updatedTeam);
+    }
 }

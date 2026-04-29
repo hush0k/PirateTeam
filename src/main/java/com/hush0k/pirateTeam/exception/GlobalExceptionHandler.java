@@ -1,6 +1,7 @@
 package com.hush0k.pirateTeam.exception;
 
 import com.hush0k.pirateTeam.exception.island.IslandNotFoundException;
+import com.hush0k.pirateTeam.exception.pirate.InsufficientPirateTreasuryException;
 import com.hush0k.pirateTeam.exception.pirate.PirateInvalidRankException;
 import com.hush0k.pirateTeam.exception.pirate.PirateNotCaptainException;
 import com.hush0k.pirateTeam.exception.pirate.PirateNotFoundException;
@@ -72,6 +73,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InsufficientTreasuryException.class)
     public ResponseEntity<ErrorResponse> handleInsufficientTreasuryException(
             InsufficientTreasuryException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(InsufficientPirateTreasuryException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientPirateTreasuryException(
+            InsufficientPirateTreasuryException e,
             HttpServletRequest request
     ) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
