@@ -28,6 +28,9 @@ public class Team {
     @Column(name="capitan_id")
     private UUID capitanId;
 
+    @Column(name="fleet_id")
+    private UUID fleetId;
+
     @ElementCollection
     @CollectionTable(
             name="team_pirates",
@@ -37,14 +40,29 @@ public class Team {
     @Builder.Default
     private Set<UUID> pirateIds = new HashSet<>();
 
-    @Column(name="treasury")
-    private int treasury;
-
     @Column(name="reputation")
     private int reputation;
 
+    @Column(name="treasury")
+    private int treasury;
+
     @Column(name="cohesion")
     private int cohesion;
+
+    @Column(name="morale")
+    private int morale;
+
+    @Column(name="loot_bonus")
+    private int lootBonus;
+
+    @Column(name="loyalty")
+    private int loyalty;
+
+    @Column(name="power")
+    private int power;
+
+    @Column(name="fatigue")
+    private int fatigue;
 
     @Column(name="created_at")
     private LocalDateTime createdAt;
@@ -57,10 +75,6 @@ public class Team {
     public void prePersist(){
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-
-        if (cohesion == 0){
-            cohesion = 50;
-        }
     }
 
     @PreUpdate

@@ -1,0 +1,5 @@
+ALTER TABLE pirate
+    ADD COLUMN treasury     INT NOT NULL DEFAULT 0,
+    ADD COLUMN bloodlust    INT NOT NULL DEFAULT 50,
+    ADD COLUMN intelligence INT NOT NULL DEFAULT 50,
+    ADD COLUMN strength     INT NOT NULL DEFAULT 50;

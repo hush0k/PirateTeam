@@ -45,6 +45,18 @@ public class Pirate {
     @Column(name="reputation")
     private int reputation;
 
+    @Column(name="treasury")
+    private int treasury;
+
+    @Column(name="bloodlust")
+    private int bloodlust;
+
+    @Column(name="intelligence")
+    private int intelligence;
+
+    @Column(name="strength")
+    private int strength;
+
     @Column(name="home_island_id")
     private UUID homeIslandId;
 
