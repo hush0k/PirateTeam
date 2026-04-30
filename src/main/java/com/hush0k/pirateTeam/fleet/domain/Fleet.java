@@ -31,6 +31,12 @@ public class Fleet {
     @Column(name="provision")
     private int provision;
 
+    @Column(name="coordinate_x")
+    private int coordinateX;
+
+    @Column(name="coordinate_y")
+    private int coordinateY;
+
     @Column(name="created_at")
     private LocalDateTime createdAt;
 

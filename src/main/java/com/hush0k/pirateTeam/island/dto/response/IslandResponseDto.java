@@ -13,6 +13,8 @@ public record IslandResponseDto(
         String name,
         String nickname,
         double area,
+        int coordinateX,
+        int coordinateY,
         IslandLocation location,
         UUID ownerId,
         int population,

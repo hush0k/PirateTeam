@@ -103,51 +103,10 @@ public class TeamService {
         return getExisting(id);
     }
 
-    // Team membership operations
-    public TeamResponseDto addNewPirate(UUID id, TeamMembersChangeDto dto) {
-        Team team = getExisting(id);
-
-        Set<UUID> pirateIds = new HashSet<>(team.getPirateIds());
-        Set<UUID> alreadyInTeam = findExistingPirateIds(pirateIds, dto.pirates());
-        if (!alreadyInTeam.isEmpty()) {
-            log.warn("Team with id: {} already contains pirates: {}", id, alreadyInTeam);
-            throw new PirateAlreadyInTeamException(id, alreadyInTeam);
-        }
-
-        pirateIds.addAll(dto.pirates());
-        team.setPirateIds(pirateIds);
-        Team updatedTeam = teamRepository.save(team);
-
-        pirateFeignClient.assignManyToTeam(id, dto.pirates());
-
-        log.info("Team with id: {} added new pirates successfully: {}", id, dto.pirates());
-        return teamMapper.toTeamResponseDto(updatedTeam);
-    }
-
-    public TeamResponseDto removePirate(UUID id, TeamMembersChangeDto dto) {
-        Team team = getExisting(id);
-
-        Set<UUID> pirateIds = new HashSet<>(team.getPirateIds());
-        Set<UUID> missingPirates = findMissingPirateIds(pirateIds, dto.pirates());
-
-        if (dto.pirates().contains(team.getCapitanId())) {
-            log.warn("Attempt to remove captain {} from team {}", team.getCapitanId(), id);
-            throw new CannotRemoveCaptainException(id, team.getCapitanId());
-        }
-
-        if (!missingPirates.isEmpty()) {
-            log.warn("Team with id: {} does not contain pirates: {}", id, missingPirates);
-            throw new PirateNotInTeamException(id, missingPirates);
-        }
-
-        pirateIds.removeAll(dto.pirates());
-        team.setPirateIds(pirateIds);
-        Team updatedTeam = teamRepository.save(team);
-
-        pirateFeignClient.removeManyFromTeam(id, dto.pirates());
-
-        log.info("Team with id: {} removed pirates successfully: {}", id, dto.pirates());
-        return teamMapper.toTeamResponseDto(updatedTeam);
+    public void assignFleetToTeam(UUID teamId, UUID fleetId) {
+        Team team = getTeam(teamId);
+        team.setFleetId(fleetId);
+        teamRepository.save(team);
     }
 
     // Treasury operations

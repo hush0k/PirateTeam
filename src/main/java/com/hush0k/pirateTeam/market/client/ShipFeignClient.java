@@ -16,9 +16,9 @@ import java.util.UUID;
 )
 public interface ShipFeignClient {
 
-    @GetMapping("/by-fleet/{fleetId}/stats")
-    FleetClientStatsDto getFleetShipStatsByFleetId(@PathVariable UUID fleetId);
+    @GetMapping("/api/ships/by-fleet/{fleetId}/stats")
+    FleetClientStatsDto getFleetShipStatsByFleetId(@PathVariable("fleetId") UUID fleetId);
 
-    @PatchMapping("/by-fleet/{fleetId}/load-cargo")
-    void loadCargo(@PathVariable UUID fleetId, @RequestParam int amount);
+    @PatchMapping("/api/ships/by-fleet/{fleetId}/load-cargo")
+    void loadCargo(@PathVariable("fleetId") UUID fleetId, @RequestParam("amount") int amount);
 }

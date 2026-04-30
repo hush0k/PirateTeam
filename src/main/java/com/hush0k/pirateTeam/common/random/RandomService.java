@@ -2,6 +2,7 @@ package com.hush0k.pirateTeam.common.random;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
@@ -77,5 +78,9 @@ public class RandomService {
         if (sharpness <= 0) {
             throw new IllegalArgumentException("Резкость распределения должна быть больше 0");
         }
+    }
+
+    public int simpleRandom(int min, int max) {
+        return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
 }

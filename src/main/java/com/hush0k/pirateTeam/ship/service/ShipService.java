@@ -1,22 +1,14 @@
 package com.hush0k.pirateTeam.ship.service;
 
 import com.hush0k.pirateTeam.exception.pirate.PirateNotCaptainException;
-import com.hush0k.pirateTeam.exception.pirate.PirateNotEnoughTreasury;
-import com.hush0k.pirateTeam.exception.ship.ShipNotOwnedByThisCapitan;
-import com.hush0k.pirateTeam.exception.ship.ShipUnavailableToSale;
-import com.hush0k.pirateTeam.pirate.dto.request.PirateTreasuryChangeDto;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
 import com.hush0k.pirateTeam.ship.client.PirateFeignClient;
-import com.hush0k.pirateTeam.ship.client.FleetFeignClient;
-import com.hush0k.pirateTeam.ship.client.dto.FleetClientDto;
-import com.hush0k.pirateTeam.ship.client.dto.FleetCreateClientDto;
 import com.hush0k.pirateTeam.ship.client.dto.PirateClientDto;
 import com.hush0k.pirateTeam.ship.domain.Ship;
 import com.hush0k.pirateTeam.ship.dto.request.ShipCreateDto;
 import com.hush0k.pirateTeam.ship.dto.request.ShipUpdateDto;
 import com.hush0k.pirateTeam.ship.dto.response.FleetShipStatsDto;
 import com.hush0k.pirateTeam.ship.dto.response.ShipResponseDto;
-import com.hush0k.pirateTeam.ship.enums.ShipOwnership;
 import com.hush0k.pirateTeam.ship.mapper.ShipMapper;
 import com.hush0k.pirateTeam.ship.repository.ShipRepository;
 import com.hush0k.pirateTeam.exception.ship.ShipNotFoundException;
@@ -37,7 +29,6 @@ public class ShipService {
     private final ShipRepository shipRepository;
     private final ShipMapper shipMapper;
     private final PirateFeignClient pirateFeignClient;
-    private final FleetFeignClient fleetFeignClient;
 
     @Transactional(readOnly = true)
     private Ship getExisting(UUID id) {
@@ -133,63 +124,6 @@ public class ShipService {
         return new FleetShipStatsDto(totalPower, avgSpeed, maxCrew, maxCargo, filledCargoSpace);
     }
 
-    public ShipResponseDto buyShip(UUID shipId, UUID captainId) {
-        Ship ship = getExisting(shipId);
-
-        if (ship.getOwnership() != ShipOwnership.AVAILABLE_FOR_SALE){
-            log.warn("Ship already owned by an ownership");
-            throw new ShipUnavailableToSale(shipId);
-        }
-
-        PirateClientDto buyerPirate = pirateFeignClient.getPirateById(captainId);
-
-        if (!buyerPirate.rank().isHigherThan(Rank.NAVIGATOR)) {
-            throw new PirateNotCaptainException(captainId);
-        }
-        if (ship.getPrice() > buyerPirate.treasury()) {
-            throw new PirateNotEnoughTreasury(captainId);
-        }
-
-        FleetClientDto fleet = fleetFeignClient.createFleet(
-                buyerPirate.id(),
-                new FleetCreateClientDto(buyerPirate.id(), "Fleet of " + buyerPirate.firstName() + " " + buyerPirate.lastName())
-        );
-
-        if (ship.getOwnerId() != null) {
-            PirateClientDto sellerPirate = pirateFeignClient.getPirateById(ship.getOwnerId());
-            pirateFeignClient.addPirate(sellerPirate.id(), new PirateTreasuryChangeDto(ship.getPrice()));
-        }
-
-        pirateFeignClient.withdrawPirate(captainId, new PirateTreasuryChangeDto(ship.getPrice()));
-
-        ship.setCapitanId(captainId);
-        ship.setFleetId(fleet.id());
-        ship.setOwnerId(captainId);
-        ship.setOwnership(ShipOwnership.OWNED);
-        Ship updatedShip = shipRepository.save(ship);
-        log.info("Корабль с ID: {} успешно продан", updatedShip.getId());
-        return shipMapper.toShipDto(updatedShip);
-    }
-
-    public ShipResponseDto offerForSale(UUID shipId, UUID captainId) {
-        Ship ship = getExisting(shipId);
-        if (ship.getOwnership() != ShipOwnership.OWNED || !ship.getCapitanId().equals(captainId)) {
-            log.warn("Корабль не принадлежит капитану");
-            throw new ShipNotOwnedByThisCapitan(shipId, captainId);
-        }
-
-        ship.setOwnership(ShipOwnership.AVAILABLE_FOR_SALE);
-        ship.setCapitanId(null);
-        ship.setFleetId(null);
-        Ship updatedShip = shipRepository.save(ship);
-        log.info("Корабль с ID: {} успешно выставлен на продажу", updatedShip.getId());
-        return shipMapper.toShipDto(updatedShip);
-    }
-
-    public List<ShipResponseDto> showMarket(){
-        return shipMapper.toShipDtoList(shipRepository.getByOwnership(ShipOwnership.AVAILABLE_FOR_SALE));
-    }
-
     public void loadCargo(UUID fleetId, int amount) {
         List<Ship> ships = shipRepository.getByFleetId(fleetId);
         int remaining = amount;
@@ -204,5 +138,4 @@ public class ShipService {
 
         shipRepository.saveAll(ships);
     }
-
 }

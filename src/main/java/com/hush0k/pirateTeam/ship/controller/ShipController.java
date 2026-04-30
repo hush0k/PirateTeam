@@ -73,13 +73,6 @@ public class ShipController {
         return shipService.getAll();
     }
 
-    @GetMapping("/market")
-    @Operation(summary = "Get ships available for sale")
-    @ApiResponse(responseCode = "200", description = "List of ships available for sale")
-    public List<ShipResponseDto> showMarket() {
-        return shipService.showMarket();
-    }
-
     @GetMapping("/{id}")
     @Operation(summary = "Get a ship by ID")
     @ApiResponses({
@@ -115,20 +108,6 @@ public class ShipController {
         return shipService.assignCaptain(shipId, captainId);
     }
 
-    @PatchMapping("/{shipId}/buy/{captainId}")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Buy a ship and assign captain with auto-created fleet")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ship bought successfully"),
-            @ApiResponse(responseCode = "404", description = "Ship or pirate not found")
-    })
-    public ShipResponseDto buyShip(
-            @Parameter(description = "Ship UUID") @PathVariable UUID shipId,
-            @Parameter(description = "Captain UUID") @PathVariable UUID captainId
-    ) {
-        return shipService.buyShip(shipId, captainId);
-    }
-
     @PatchMapping("/by-fleet/{fleetId}/load-cargo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Distribute cargo across all ships in a fleet")
@@ -139,22 +118,4 @@ public class ShipController {
     ) {
         shipService.loadCargo(fleetId, amount);
     }
-
-    @PatchMapping("/{shipId}/sale/{captainId}")
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Offer ship for sale by captain")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Ship offered for sale successfully"),
-            @ApiResponse(responseCode = "403", description = "Captain is not owner of this ship"),
-            @ApiResponse(responseCode = "404", description = "Ship not found")
-    })
-    public ShipResponseDto offerShipForSale(
-            @Parameter(description = "Ship UUID") @PathVariable UUID shipId,
-            @Parameter(description = "Captain UUID") @PathVariable UUID captainId
-    ) {
-        return shipService.offerForSale(shipId, captainId);
-    }
-
-
-
 }

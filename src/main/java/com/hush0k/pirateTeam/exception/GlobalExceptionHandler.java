@@ -1,6 +1,9 @@
 package com.hush0k.pirateTeam.exception;
 
 import com.hush0k.pirateTeam.exception.fleet.FleetNotFoundException;
+import com.hush0k.pirateTeam.exception.fleet.InsufficientDistanceToBattle;
+import com.hush0k.pirateTeam.exception.fleet.InsufficientPirateSpaceException;
+import com.hush0k.pirateTeam.exception.fleet.InsufficientProvisionException;
 import com.hush0k.pirateTeam.exception.island.IslandNotFoundException;
 import com.hush0k.pirateTeam.exception.pirate.*;
 import com.hush0k.pirateTeam.exception.ship.*;
@@ -87,6 +90,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InsufficientPirateSpaceException.class)
     public ResponseEntity<ErrorResponse> handleInsufficientPirateSpaceException(
             InsufficientPirateSpaceException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(InsufficientProvisionException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientProvisionException(
+            InsufficientProvisionException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(InsufficientDistanceToBattle.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientDistanceToBattleException(
+            InsufficientDistanceToBattle e,
             HttpServletRequest request
     ) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);

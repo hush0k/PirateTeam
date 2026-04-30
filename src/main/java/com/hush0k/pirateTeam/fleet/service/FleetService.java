@@ -3,14 +3,17 @@ package com.hush0k.pirateTeam.fleet.service;
 import com.hush0k.pirateTeam.exception.fleet.FleetNotFoundException;
 import com.hush0k.pirateTeam.fleet.client.ShipClientService;
 import com.hush0k.pirateTeam.fleet.client.TeamClientService;
+import com.hush0k.pirateTeam.fleet.client.dto.PirateClientDto;
 import com.hush0k.pirateTeam.fleet.client.dto.TeamDto;
 import com.hush0k.pirateTeam.fleet.domain.Fleet;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetCreateDto;
+import com.hush0k.pirateTeam.fleet.dto.request.FleetResourceChangeDto;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetUpdateDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetResponseDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetStatsDto;
 import com.hush0k.pirateTeam.fleet.mapper.FleetMapper;
 import com.hush0k.pirateTeam.fleet.repository.FleetRepository;
+import feign.FeignException;
 import com.hush0k.pirateTeam.ship.dto.response.FleetShipStatsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +41,11 @@ public class FleetService {
             return fleetIsExists.get();
         }
 
+        PirateClientDto teamId = teamClientService.getPirateById(dto.ownerId());
+
         log.info("Creating new fleet for owner: {}", dto.ownerId());
         Fleet fleet = fleetMapper.toFleet(dto);
+        teamClientService.assignFleetToTeam(dto.ownerId(), teamId.teamId());
         Fleet savedFleet = fleetRepository.save(fleet);
         log.info("Fleet created successfully with id: {}", savedFleet.getId());
         return fleetMapper.toFleetResponseDto(savedFleet);
@@ -85,7 +91,7 @@ public class FleetService {
 
 
     @Transactional(readOnly = true)
-    private Fleet getExisting(UUID id) {
+    Fleet getExisting(UUID id) {
         log.debug("Fetching fleet with id: {}", id);
         return fleetRepository.findById(id).orElseThrow(
                 () -> {
@@ -102,7 +108,13 @@ public class FleetService {
         getExisting(id);
 
         FleetShipStatsDto fleetShipStats = shipClientService.getStats(id);
-        TeamDto fleetTeamStats = teamClientService.getByFleetId(id);
+        TeamDto fleetTeamStats;
+        try {
+            fleetTeamStats = teamClientService.getByFleetId(id);
+        } catch (FeignException.NotFound e) {
+            log.warn("Team not found for fleet id: {}. Calculating fleet stats with zero team modifiers", id);
+            fleetTeamStats = new TeamDto(null, "No team", null, null, 0, 0, 0, 0, 0, 0, 0, 0);
+        }
 
         int militaryPower = fleetShipStats.totalPower() + fleetTeamStats.power();
         int boardingPower = fleetTeamStats.power() + fleetTeamStats.cohesion();
@@ -112,8 +124,44 @@ public class FleetService {
                 0,
                 100
         );
-        int lootMultiplier = 100 + fleetTeamStats.lootBonus();
+        float lootMultiplier = 1.0f + (fleetTeamStats.lootBonus() / 100.0f);
 
         return new FleetStatsDto(militaryPower, boardingPower, manoeuvrability, combatStability, lootMultiplier);
     }
+
+    public FleetResponseDto addAmmo(UUID id, FleetResourceChangeDto dto) {
+        Fleet fleet = getExisting(id);
+        fleet.setAmmo(fleet.getAmmo() + dto.amount());
+        Fleet updatedFleet = fleetRepository.save(fleet);
+        return fleetMapper.toFleetResponseDto(updatedFleet);
+    }
+
+    public FleetResponseDto withdrawAmmo(UUID id, FleetResourceChangeDto dto) {
+        Fleet fleet = getExisting(id);
+        if (fleet.getAmmo() < dto.amount()) {
+            throw new IllegalArgumentException("Not enough ammo in fleet");
+        }
+        fleet.setAmmo(fleet.getAmmo() - dto.amount());
+        Fleet updatedFleet = fleetRepository.save(fleet);
+        return fleetMapper.toFleetResponseDto(updatedFleet);
+    }
+
+    public FleetResponseDto addProvision(UUID id, FleetResourceChangeDto dto) {
+        Fleet fleet = getExisting(id);
+        fleet.setProvision(fleet.getProvision() + dto.amount());
+        Fleet updatedFleet = fleetRepository.save(fleet);
+        return fleetMapper.toFleetResponseDto(updatedFleet);
+    }
+
+    public FleetResponseDto withdrawProvision(UUID id, FleetResourceChangeDto dto) {
+        Fleet fleet = getExisting(id);
+        if (fleet.getProvision() < dto.amount()) {
+            throw new IllegalArgumentException("Not enough provision in fleet");
+        }
+        fleet.setProvision(fleet.getProvision() - dto.amount());
+        Fleet updatedFleet = fleetRepository.save(fleet);
+        return fleetMapper.toFleetResponseDto(updatedFleet);
+    }
+
+
 }

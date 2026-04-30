@@ -1,6 +1,7 @@
 package com.hush0k.pirateTeam.fleet.controller;
 
 import com.hush0k.pirateTeam.fleet.dto.request.FleetCreateDto;
+import com.hush0k.pirateTeam.fleet.dto.request.FleetResourceChangeDto;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetUpdateDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetResponseDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetStatsDto;
@@ -111,5 +112,65 @@ public class FleetController {
             @Parameter(description = "Fleet UUID") @PathVariable UUID id
     ) {
         return fleetService.getStats(id);
+    }
+
+    @PatchMapping("/{id}/ammo/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add ammo to fleet")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fleet ammo increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Fleet not found")
+    })
+    public FleetResponseDto addAmmo(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID id,
+            @Valid @RequestBody FleetResourceChangeDto dto
+    ) {
+        return fleetService.addAmmo(id, dto);
+    }
+
+    @PatchMapping("/{id}/ammo/withdraw")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Withdraw ammo from fleet")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fleet ammo reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or not enough ammo"),
+            @ApiResponse(responseCode = "404", description = "Fleet not found")
+    })
+    public FleetResponseDto withdrawAmmo(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID id,
+            @Valid @RequestBody FleetResourceChangeDto dto
+    ) {
+        return fleetService.withdrawAmmo(id, dto);
+    }
+
+    @PatchMapping("/{id}/provision/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add provision to fleet")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fleet provision increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Fleet not found")
+    })
+    public FleetResponseDto addProvision(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID id,
+            @Valid @RequestBody FleetResourceChangeDto dto
+    ) {
+        return fleetService.addProvision(id, dto);
+    }
+
+    @PatchMapping("/{id}/provision/withdraw")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Withdraw provision from fleet")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fleet provision reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or not enough provision"),
+            @ApiResponse(responseCode = "404", description = "Fleet not found")
+    })
+    public FleetResponseDto withdrawProvision(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID id,
+            @Valid @RequestBody FleetResourceChangeDto dto
+    ) {
+        return fleetService.withdrawProvision(id, dto);
     }
 }

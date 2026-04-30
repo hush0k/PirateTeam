@@ -1,9 +1,13 @@
 package com.hush0k.pirateTeam.fleet.client;
 
+import com.hush0k.pirateTeam.fleet.client.dto.PirateClientDto;
 import com.hush0k.pirateTeam.fleet.client.dto.TeamDto;
+import com.hush0k.pirateTeam.fleet.client.dto.TeamTreasuryCharacteristicClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
@@ -19,5 +23,33 @@ public interface TeamClientService {
 
     @GetMapping("/api/teams/by-fleet/{fleetId}")
     public TeamDto getByFleetId(@PathVariable UUID fleetId);
+
+    @GetMapping("/api/teams/{teamId}/fleet/{fleetId}")
+    void assignFleetToTeam(@PathVariable UUID teamId, @PathVariable UUID fleetId);
+
+    @GetMapping("/api/pirates/{id}")
+    PirateClientDto getPirateById(UUID id);
+
+    @PatchMapping("/api/teams/{id}/treasury/add")
+    void addTreasuryToTeam(@PathVariable UUID id, @RequestParam TeamTreasuryCharacteristicClient dto);
+
+    @PatchMapping("/api/teams/{id}/treasury/remove")
+    void withdrawTreasuryToTeam(@PathVariable UUID id, @RequestParam TeamTreasuryCharacteristicClient dto);
+
+    @PatchMapping("/api/teams/{id}/fatigue/add")
+    void addFatigueToTeam(@PathVariable UUID id, @RequestParam TeamTreasuryCharacteristicClient dto);
+
+    @PatchMapping("/api/teams/{id}/loyalty/add")
+    void addLoyaltyToTeam(@PathVariable UUID id, @RequestParam TeamTreasuryCharacteristicClient dto);
+
+    @PatchMapping("/api/teams/{id}/loyalty/remove")
+    void withdrawLoyaltyToTeam(@PathVariable UUID id, @RequestParam TeamTreasuryCharacteristicClient dto);
+
+    @PatchMapping("/api/teams/{id}/morale/add")
+    void addMoraleToTeam(@PathVariable UUID id, @RequestParam TeamTreasuryCharacteristicClient dto);
+
+    @PatchMapping("/api/teams/{id}/morale/remove")
+    void withdrawMoraleToTeam(@PathVariable UUID id, @RequestParam TeamTreasuryCharacteristicClient dto);
+
 
 }

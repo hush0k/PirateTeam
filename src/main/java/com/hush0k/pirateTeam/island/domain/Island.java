@@ -31,6 +31,12 @@ public class Island {
     @Column(name = "nickname")
     private String nickname;
 
+    @Column(name="coordinate_x")
+    private int coordinateX;
+
+    @Column(name="coordinate_y")
+    private int coordinateY;
+
     @Column(name = "area")
     private double area;
 

@@ -16,6 +16,9 @@ public record IslandCreateDto(
         @Size(min = 2, max = 100, message = "Прозвище острова должно быть от 2 до 100 символов")
         String nickname,
 
+        int coordinateX,
+        int coordinateY,
+
         @Positive(message = "Площадь острова должна быть больше 0")
         double area,
 

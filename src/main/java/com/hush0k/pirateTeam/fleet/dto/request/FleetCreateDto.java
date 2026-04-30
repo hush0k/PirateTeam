@@ -10,5 +10,8 @@ public record FleetCreateDto(
         UUID ownerId,
 
         @Size(min = 3, max = 100, message = "Название должно быть от 3 до 100 символов")
-        String name
+        String name,
+
+        int coordinateX,
+        int coordinateY
 ) {}

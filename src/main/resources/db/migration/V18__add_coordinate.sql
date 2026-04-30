@@ -1,0 +1,7 @@
+ALTER TABLE fleet
+    ADD COLUMN coordinate_x INT NOT NULL DEFAULT 0,
+    ADD COLUMN coordinate_y INT NOT NULL DEFAULT 0;
+
+ALTER TABLE island
+    ADD COLUMN coordinate_x INT NOT NULL DEFAULT 0,
+    ADD COLUMN coordinate_y INT NOT NULL DEFAULT 0;

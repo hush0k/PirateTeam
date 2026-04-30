@@ -9,6 +9,8 @@ public record FleetResponseDto(
         UUID id,
         UUID ownerId,
         String name,
+        int coordinateX,
+        int coordinateY,
         int ammo,
         int provision,
 

@@ -107,6 +107,20 @@ public class TeamController {
         return teamService.getByFleetId(fleetId);
     }
 
+    @PatchMapping("/{teamId}/fleet/{fleetId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Assign fleet to team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Fleet assigned to team successfully"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public void assignFleetToTeam(
+            @Parameter(description = "Team UUID") @PathVariable UUID teamId,
+            @Parameter(description = "Fleet UUID") @PathVariable UUID fleetId
+    ) {
+        teamService.assignFleetToTeam(teamId, fleetId);
+    }
+
     @PatchMapping("/{id}/treasury/add")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Add treasure to team treasury")

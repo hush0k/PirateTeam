@@ -6,7 +6,7 @@ public record FleetStatsDto(
         int boardingPower,
         int manoeuvrability,
         int combatStability,
-        int lootMultiplier
+        float lootMultiplier
 
 ) {}
 
