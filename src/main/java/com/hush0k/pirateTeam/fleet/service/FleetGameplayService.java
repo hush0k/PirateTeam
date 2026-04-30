@@ -60,6 +60,11 @@ public class FleetGameplayService {
         Fleet myFleet = fleetService.getExisting(fleetId);
         Fleet enemyFleet = fleetService.getExisting(enemyFleetId);
 
+        int distance = calculateDistance(myFleet.getCoordinateX(), myFleet.getCoordinateY(), enemyFleet.getCoordinateX(), enemyFleet.getCoordinateY());
+        if (distance > 30) {
+            throw new InsufficientDistanceToBattle(distance);
+        }
+
         if(myFleet.getAmmo() < 65) {
             throw new InsufficientAmmoException(fleetId);
         }
@@ -67,12 +72,7 @@ public class FleetGameplayService {
         int mySpentAmmo = randomService.simpleRandom(35, 65);
         int enemySpentAmmo =  randomService.simpleRandom(35, 65);
 
-        myFleet.setAmmo();
-
-        int distance = calculateDistance(myFleet.getCoordinateX(), myFleet.getCoordinateY(), enemyFleet.getCoordinateX(), enemyFleet.getCoordinateY());
-        if (distance > 30) {
-            throw new InsufficientDistanceToBattle(distance);
-        }
+        myFleet.setAmmo(myFleet.getAmmo() - mySpentAmmo);
 
         TeamDto myTeam = teamClientService.getByFleetId(fleetId);
         TeamDto enemyTeam = teamClientService.getByFleetId(enemyFleetId);
@@ -98,9 +98,11 @@ public class FleetGameplayService {
 
         if (enemySpentAmmo > enemyFleet.getAmmo()){
             myFleetRating = (int)(myFleetRating * 0.9);
+            enemyFleet.setAmmo(0);
         }
+        enemyFleet.setAmmo(enemyFleet.getAmmo() - enemySpentAmmo);
 
-        myFleetRating *= (int)(1 - 0.005 * myTeam.fatigue());
+        myFleetRating = (int)(myFleetRating * (1 - 0.005 * myTeam.fatigue()));
         enemyFleetRating *= (int)(1 - 0.005 * enemyTeam.fatigue());
 
         int center = 50 + (int) myFleetRating - (int) enemyFleetRating;
@@ -129,7 +131,7 @@ public class FleetGameplayService {
 
 
         } else if (result < 50) {
-            winnerName = myFleet.getName();
+            winnerName = enemyFleet.getName();
             teamClientService.addTreasuryToTeam(enemyTeam.id(),
                     new TeamTreasuryCharacteristicClient(myTreasury));
             teamClientService.withdrawTreasuryToTeam(myTeam.id(),
@@ -156,8 +158,9 @@ public class FleetGameplayService {
         teamClientService.addFatigueToTeam(myTeam.id(), new TeamTreasuryCharacteristicClient(myFatigue));
         teamClientService.addFatigueToTeam(enemyTeam.id(), new TeamTreasuryCharacteristicClient(enemyFatigue));
 
+        String lootedTreasury = result > 50 ? "+" + enemyTreasury : (result < 50 ? "-" + myTreasury : "0");
 
-        return new FleetAttackResult(fleetId, enemyFleetId, winnerName, result, myFatigue, mySpentAmmo, enemyTreasury);
+        return new FleetAttackResult(fleetId, enemyFleetId, winnerName, result, myFatigue, mySpentAmmo, lootedTreasury);
 
     }
 }

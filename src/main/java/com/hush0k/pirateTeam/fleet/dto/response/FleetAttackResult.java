@@ -9,5 +9,5 @@ public record FleetAttackResult(
         int result,
         int fatigue,
         int spentAmmo,
-        int lootedTreasury
+        String lootedTreasury
 ) {}
