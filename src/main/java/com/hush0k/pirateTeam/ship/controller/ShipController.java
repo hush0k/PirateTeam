@@ -129,6 +129,17 @@ public class ShipController {
         return shipService.buyShip(shipId, captainId);
     }
 
+    @PatchMapping("/by-fleet/{fleetId}/load-cargo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Distribute cargo across all ships in a fleet")
+    @ApiResponse(responseCode = "204", description = "Cargo loaded successfully")
+    public void loadCargo(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID fleetId,
+            @RequestParam int amount
+    ) {
+        shipService.loadCargo(fleetId, amount);
+    }
+
     @PatchMapping("/{shipId}/sale/{captainId}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Offer ship for sale by captain")

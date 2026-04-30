@@ -190,6 +190,19 @@ public class ShipService {
         return shipMapper.toShipDtoList(shipRepository.getByOwnership(ShipOwnership.AVAILABLE_FOR_SALE));
     }
 
+    public void loadCargo(UUID fleetId, int amount) {
+        List<Ship> ships = shipRepository.getByFleetId(fleetId);
+        int remaining = amount;
 
+        for (Ship ship : ships) {
+            if (remaining <= 0) break;
+            int free = ship.getCargoCapacity() - ship.getFilledCargoSpace();
+            int load = Math.min(free, remaining);
+            ship.setFilledCargoSpace(ship.getFilledCargoSpace() + load);
+            remaining -= load;
+        }
+
+        shipRepository.saveAll(ships);
+    }
 
 }

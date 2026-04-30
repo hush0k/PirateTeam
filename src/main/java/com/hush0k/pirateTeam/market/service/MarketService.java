@@ -21,9 +21,9 @@ import java.util.UUID;
 @Slf4j
 public class MarketService {
 
-    private TeamFeignClient teamFeignClient;
-    private FleetFeignClient fleetFeignClient;
-    private ShipFeignClient shipFeignClient;
+    private final TeamFeignClient teamFeignClient;
+    private final FleetFeignClient fleetFeignClient;
+    private final ShipFeignClient shipFeignClient;
 
     public ReceiptDto buyAmmo(UUID fleetId, int quantity) {
         TeamClientDto team = teamFeignClient.getByFleetId(fleetId);
@@ -31,7 +31,7 @@ public class MarketService {
         int totalPrice = quantity * 500;
 
         if (totalPrice > team.treasury()) {
-            throw new InsufficientTreasuryException("боеприпасы", totalPrice-team.treasury());
+            throw new InsufficientTreasuryException("боеприпасы", totalPrice - team.treasury());
         }
 
         FleetClientStatsDto fleetStats = shipFeignClient.getFleetShipStatsByFleetId(fleetId);
@@ -42,7 +42,8 @@ public class MarketService {
             throw new InsufficientPirateSpaceException("боеприпасы");
         }
 
-//        fleetStats.setFilledCargoSpace(fleetStats.getFilledCargoSpace() + quantity * 5);
+        shipFeignClient.loadCargo(fleetId, quantity * 5);
 
+        return new ReceiptDto("боеприпасы", quantity, totalPrice, true);
     }
 }
