@@ -2,6 +2,7 @@ package com.hush0k.pirateTeam.ship.controller;
 
 import com.hush0k.pirateTeam.ship.dto.request.ShipCreateDto;
 import com.hush0k.pirateTeam.ship.dto.request.ShipUpdateDto;
+import com.hush0k.pirateTeam.ship.dto.response.FleetShipStatsDto;
 import com.hush0k.pirateTeam.ship.dto.response.ShipResponseDto;
 import com.hush0k.pirateTeam.ship.service.ShipService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,7 +82,16 @@ public class ShipController {
     public ShipResponseDto get(
             @Parameter(description = "Ship UUID") @PathVariable UUID id
     ) {
-        return shipService.findById(id);
+        return shipService.getById(id);
+    }
+
+    @GetMapping("/by-fleet/{fleetId}/stats")
+    @Operation(summary = "Get ship stats by fleet ID")
+    @ApiResponse(responseCode = "200", description = "Fleet ship stats calculated successfully")
+    public FleetShipStatsDto getStatsByFleetId(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID fleetId
+    ) {
+        return shipService.getByFleetId(fleetId);
     }
 
     @PatchMapping("/{shipId}/capitan/{captainId}")
@@ -97,4 +107,36 @@ public class ShipController {
     ) {
         return shipService.assignCaptain(shipId, captainId);
     }
+
+    @PatchMapping("/{shipId}/buy/{captainId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Buy a ship and assign captain with auto-created fleet")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ship bought successfully"),
+            @ApiResponse(responseCode = "404", description = "Ship or pirate not found")
+    })
+    public ShipResponseDto buyShip(
+            @Parameter(description = "Ship UUID") @PathVariable UUID shipId,
+            @Parameter(description = "Captain UUID") @PathVariable UUID captainId
+    ) {
+        return shipService.buyShip(shipId, captainId);
+    }
+
+    @PatchMapping("/{shipId}/sale/{captainId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Offer ship for sale by captain")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ship offered for sale successfully"),
+            @ApiResponse(responseCode = "403", description = "Captain is not owner of this ship"),
+            @ApiResponse(responseCode = "404", description = "Ship not found")
+    })
+    public ShipResponseDto offerShipForSale(
+            @Parameter(description = "Ship UUID") @PathVariable UUID shipId,
+            @Parameter(description = "Captain UUID") @PathVariable UUID captainId
+    ) {
+        return shipService.offerForSale(shipId, captainId);
+    }
+
+
+
 }

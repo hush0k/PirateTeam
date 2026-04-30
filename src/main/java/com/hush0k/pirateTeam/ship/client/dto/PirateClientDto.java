@@ -8,5 +8,6 @@ public record PirateClientDto(
         UUID id,
         String firstName,
         String lastName,
-        Rank rank
+        Rank rank,
+        int treasury
 ) {}

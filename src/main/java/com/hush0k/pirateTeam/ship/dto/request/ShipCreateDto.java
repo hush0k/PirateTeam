@@ -1,6 +1,7 @@
 package com.hush0k.pirateTeam.ship.dto.request;
 
 import com.hush0k.pirateTeam.pirate.enums.Country;
+import com.hush0k.pirateTeam.ship.enums.ShipOwnership;
 import com.hush0k.pirateTeam.ship.enums.ShipType;
 import jakarta.validation.constraints.*;
 
@@ -24,10 +25,13 @@ public record ShipCreateDto(
         int maxCrew,
 
         @Positive(message = "Max speed must be positive")
-        float maxSpeed,
+        int maxSpeed,
 
         @NotNull(message = "Builder country must be specified")
         Country builderCountry,
+
+        @NotNull(message = "Ownership must be specified")
+        ShipOwnership ownership,
 
         @Positive(message = "Cargo capacity must be positive")
         int cargoCapacity,

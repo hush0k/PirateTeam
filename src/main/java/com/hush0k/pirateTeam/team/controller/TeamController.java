@@ -87,7 +87,19 @@ public class TeamController {
     public TeamResponseDto get(
             @Parameter(description = "Team UUID") @PathVariable UUID id
     ) {
-        return teamService.findById(id);
+        return teamService.getById(id);
+    }
+
+    @GetMapping("/by-fleet/{fleetId}")
+    @Operation(summary = "Get a team by fleet ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Team found"),
+            @ApiResponse(responseCode = "404", description = "Team not found by fleet ID")
+    })
+    public TeamResponseDto getByFleetId(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID fleetId
+    ) {
+        return teamService.getByFleetId(fleetId);
     }
 
     @PatchMapping("/{id}/treasury/add")

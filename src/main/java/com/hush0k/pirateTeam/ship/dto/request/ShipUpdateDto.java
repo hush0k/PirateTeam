@@ -21,7 +21,7 @@ public record ShipUpdateDto(
         Integer maxCrew,
 
         @Positive(message = "Max speed must be positive")
-        Float maxSpeed,
+        Integer maxSpeed,
 
         Country builderCountry,
 

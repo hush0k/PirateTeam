@@ -1,18 +1,24 @@
 package com.hush0k.pirateTeam.fleet.service;
 
 import com.hush0k.pirateTeam.exception.fleet.FleetNotFoundException;
+import com.hush0k.pirateTeam.fleet.client.ShipClientService;
+import com.hush0k.pirateTeam.fleet.client.TeamClientService;
+import com.hush0k.pirateTeam.fleet.client.dto.TeamDto;
 import com.hush0k.pirateTeam.fleet.domain.Fleet;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetCreateDto;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetUpdateDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetResponseDto;
+import com.hush0k.pirateTeam.fleet.dto.response.FleetStatsDto;
 import com.hush0k.pirateTeam.fleet.mapper.FleetMapper;
 import com.hush0k.pirateTeam.fleet.repository.FleetRepository;
+import com.hush0k.pirateTeam.ship.dto.response.FleetShipStatsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,8 +29,15 @@ public class FleetService {
 
     private final FleetRepository fleetRepository;
     private final FleetMapper fleetMapper;
+    private final ShipClientService shipClientService;
+    private final TeamClientService teamClientService;
 
     public FleetResponseDto create(FleetCreateDto dto) {
+        Optional<FleetResponseDto> fleetIsExists = getByOwnerId(dto.ownerId());
+        if (fleetIsExists.isPresent()) {
+            return fleetIsExists.get();
+        }
+
         log.info("Creating new fleet for owner: {}", dto.ownerId());
         Fleet fleet = fleetMapper.toFleet(dto);
         Fleet savedFleet = fleetRepository.save(fleet);
@@ -64,6 +77,14 @@ public class FleetService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<FleetResponseDto> getByOwnerId(UUID id) {
+        log.debug("Fetching fleet by owner id: {}", id);
+        Fleet fleet = fleetRepository.findByOwnerId(id).orElse(null);
+        return Optional.ofNullable(fleetMapper.toFleetResponseDto(fleet));
+    }
+
+
+    @Transactional(readOnly = true)
     private Fleet getExisting(UUID id) {
         log.debug("Fetching fleet with id: {}", id);
         return fleetRepository.findById(id).orElseThrow(
@@ -72,5 +93,27 @@ public class FleetService {
                     return new FleetNotFoundException(id);
                 }
         );
+    }
+
+
+    public FleetStatsDto getStats(UUID id) {
+        log.debug("Fetching stats for fleet with id: {}", id);
+
+        getExisting(id);
+
+        FleetShipStatsDto fleetShipStats = shipClientService.getStats(id);
+        TeamDto fleetTeamStats = teamClientService.getByFleetId(id);
+
+        int militaryPower = fleetShipStats.totalPower() + fleetTeamStats.power();
+        int boardingPower = fleetTeamStats.power() + fleetTeamStats.cohesion();
+        int manoeuvrability = (int) Math.round(fleetShipStats.avgSpeed());
+        int combatStability = Math.clamp(
+                (fleetTeamStats.morale() + fleetTeamStats.cohesion() + fleetTeamStats.loyalty() - fleetTeamStats.fatigue()) / 3,
+                0,
+                100
+        );
+        int lootMultiplier = 100 + fleetTeamStats.lootBonus();
+
+        return new FleetStatsDto(militaryPower, boardingPower, manoeuvrability, combatStability, lootMultiplier);
     }
 }

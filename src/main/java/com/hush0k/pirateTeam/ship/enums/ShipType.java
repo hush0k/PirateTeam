@@ -14,9 +14,11 @@ public enum ShipType {
 
     private final int tier;       // уровень корабля
     private final int cannons;    // кол-во пушек
+    private final int power;
 
     ShipType(int tier, int cannons) {
         this.tier = tier;
         this.cannons = cannons;
+        this.power = 10 * cannons;
     }
 }

@@ -71,9 +71,21 @@ public class TeamService {
     }
 
     @Transactional(readOnly = true)
-    public TeamResponseDto findById(UUID id) {
+    public TeamResponseDto getById(UUID id) {
         log.debug("Fetching team by id: {}", id);
         Team team = getExisting(id);
+        return teamMapper.toTeamResponseDto(team);
+    }
+
+    @Transactional(readOnly = true)
+    public TeamResponseDto getByFleetId(UUID id) {
+        log.debug("Fetching team by fleet id: {}", id);
+        Team team = teamRepository.findByFleetId(id).orElseThrow(
+                () -> {
+                    log.warn("Team not found with fleet id: {}", id);
+                    return new TeamNotFoundByFleetException(id);
+                }
+        );
         return teamMapper.toTeamResponseDto(team);
     }
 

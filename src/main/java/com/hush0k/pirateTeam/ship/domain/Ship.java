@@ -1,6 +1,7 @@
 package com.hush0k.pirateTeam.ship.domain;
 
 import com.hush0k.pirateTeam.pirate.enums.Country;
+import com.hush0k.pirateTeam.ship.enums.ShipOwnership;
 import com.hush0k.pirateTeam.ship.enums.ShipType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -48,18 +49,26 @@ public class Ship {
     private Integer price;
 
     @Column(name="max_crew")
-    private Integer maxCrew;
+    private int maxCrew;
+
+    @Column(name = "cargo_capacity")
+    private int cargoCapacity;
+
+    @Column(name="filled_cargo_space")
+    private int filledCargoSpace;
 
     @Column(name="max_speed")
-    private Float maxSpeed;
+    private int maxSpeed;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name="ownership", columnDefinition = "ship_ownership_enum")
+    private ShipOwnership ownership;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="builder_country", columnDefinition = "country_enum")
     private Country builderCountry;
-
-    @Column(name = "cargo_capacity")
-    private Integer cargoCapacity;
 
     @Column(name="created_at")
     private LocalDateTime createdAt;

@@ -2,11 +2,8 @@ package com.hush0k.pirateTeam.exception;
 
 import com.hush0k.pirateTeam.exception.fleet.FleetNotFoundException;
 import com.hush0k.pirateTeam.exception.island.IslandNotFoundException;
-import com.hush0k.pirateTeam.exception.pirate.InsufficientPirateTreasuryException;
-import com.hush0k.pirateTeam.exception.pirate.PirateInvalidRankException;
-import com.hush0k.pirateTeam.exception.pirate.PirateNotCaptainException;
-import com.hush0k.pirateTeam.exception.pirate.PirateNotFoundException;
-import com.hush0k.pirateTeam.exception.ship.ShipNotFoundException;
+import com.hush0k.pirateTeam.exception.pirate.*;
+import com.hush0k.pirateTeam.exception.ship.*;
 import com.hush0k.pirateTeam.exception.team.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -39,6 +36,14 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
 
+    @ExceptionHandler(TeamNotFoundByFleetException.class)
+    public ResponseEntity<ErrorResponse> handleTeamNotFoundByFleetException(
+            TeamNotFoundByFleetException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
+    }
+
     @ExceptionHandler(IslandNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleIslandNotFoundException(
             IslandNotFoundException e,
@@ -53,6 +58,22 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(ShipUnavailableToSale.class)
+    public ResponseEntity<ErrorResponse> handleShipUnavailableToSale(
+            ShipUnavailableToSale e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(ShipNotOwnedByThisCapitan.class)
+    public ResponseEntity<ErrorResponse> handleShipNotOwnedByThisCapitan(
+            ShipNotOwnedByThisCapitan e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), request);
     }
 
     @ExceptionHandler(FleetNotFoundException.class)
@@ -156,6 +177,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CannotRemoveCaptainException.class)
     public ResponseEntity<ErrorResponse> handleCannotRemoveCaptainException(
             CannotRemoveCaptainException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(PirateNotEnoughTreasury.class)
+    public ResponseEntity<ErrorResponse> handlePirateNotEnoughTreasury(
+            PirateNotEnoughTreasury e,
             HttpServletRequest request
     ) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);

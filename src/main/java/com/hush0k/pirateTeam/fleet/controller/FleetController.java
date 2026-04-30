@@ -1,5 +1,6 @@
 package com.hush0k.pirateTeam.fleet.controller;
 
+import com.hush0k.pirateTeam.fleet.dto.request.FleetCreateDto;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetUpdateDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetResponseDto;
 import com.hush0k.pirateTeam.fleet.service.FleetService;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -53,11 +55,37 @@ public class FleetController {
         fleetService.delete(id);
     }
 
+    @PostMapping("/owners/{ownerId}/ensure")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Create or get existing fleet for owner")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fleet created or already exists"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data")
+    })
+    public FleetResponseDto createFleet(
+            @Valid @RequestBody FleetCreateDto dto,
+            @Parameter(description = "Owner UUID") @PathVariable UUID ownerId
+    ) {
+        return fleetService.create(dto);
+    }
+
     @GetMapping
     @Operation(summary = "Get all fleets")
     @ApiResponse(responseCode = "200", description = "List of all fleets")
     public List<FleetResponseDto> getAll() {
         return fleetService.getAll();
+    }
+
+    @GetMapping("/by-owner/{ownerId}")
+    @Operation(summary = "Get a fleet by owner ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fleet found"),
+            @ApiResponse(responseCode = "404", description = "Fleet not found")
+    })
+    public Optional<FleetResponseDto> getByOwnerId(
+            @Parameter(description = "Owner pirate UUID") @PathVariable UUID ownerId
+    ) {
+        return fleetService.getByOwnerId(ownerId);
     }
 
     @GetMapping("/{id}")

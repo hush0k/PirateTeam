@@ -2,6 +2,7 @@ package com.hush0k.pirateTeam.ship.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hush0k.pirateTeam.pirate.enums.Country;
+import com.hush0k.pirateTeam.ship.enums.ShipOwnership;
 import com.hush0k.pirateTeam.ship.enums.ShipType;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ public record ShipResponseDto(
         int maxCrew,
         float maxSpeed,
         Country builderCountry,
+        ShipOwnership ownership,
         int cargoCapacity,
 
         @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss", timezone = "Asia/Almaty")
