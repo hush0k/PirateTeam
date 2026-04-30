@@ -3,6 +3,7 @@ package com.hush0k.pirateTeam.fleet.controller;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetCreateDto;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetUpdateDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetResponseDto;
+import com.hush0k.pirateTeam.fleet.dto.response.FleetStatsDto;
 import com.hush0k.pirateTeam.fleet.service.FleetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -98,5 +99,17 @@ public class FleetController {
             @Parameter(description = "Fleet UUID") @PathVariable UUID id
     ) {
         return fleetService.findById(id);
+    }
+
+    @GetMapping("/{id}/stats")
+    @Operation(summary = "Get combat stats for a fleet")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fleet stats calculated successfully"),
+            @ApiResponse(responseCode = "404", description = "Fleet not found")
+    })
+    public FleetStatsDto getStats(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID id
+    ) {
+        return fleetService.getStats(id);
     }
 }

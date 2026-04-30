@@ -84,6 +84,14 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
     }
 
+    @ExceptionHandler(InsufficientPirateSpaceException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientPirateSpaceException(
+            InsufficientPirateSpaceException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
     @ExceptionHandler(PirateInvalidRankException.class)
     public ResponseEntity<ErrorResponse> handlePirateInvalidRankException(
             PirateInvalidRankException e,

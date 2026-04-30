@@ -9,6 +9,8 @@ public record FleetResponseDto(
         UUID id,
         UUID ownerId,
         String name,
+        int ammo,
+        int provision,
 
         @JsonFormat(pattern = "dd.MM.yyyy HH:mm:ss", timezone = "Asia/Almaty")
         LocalDateTime createdAt,

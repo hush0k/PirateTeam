@@ -164,7 +164,7 @@ public class TeamService {
 
         if (team.getTreasury() < dto.amount()) {
             log.warn("Team with id: {} has insufficient treasury for loss of {}", id, dto.amount());
-            throw new InsufficientTreasuryException(id);
+            throw new InsufficientTreasuryException("ЧТО ТО", dto.amount());
         }
 
         team.setTreasury(team.getTreasury() - dto.amount());
