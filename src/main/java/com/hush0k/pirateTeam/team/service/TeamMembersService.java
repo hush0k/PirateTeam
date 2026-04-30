@@ -1,10 +1,12 @@
 package com.hush0k.pirateTeam.team.service;
 
 import com.hush0k.pirateTeam.common.random.RandomService;
+import com.hush0k.pirateTeam.exception.pirate.PirateIsPrisoner;
 import com.hush0k.pirateTeam.exception.team.CannotRemoveCaptainException;
 import com.hush0k.pirateTeam.exception.team.PirateAlreadyInTeamException;
 import com.hush0k.pirateTeam.exception.team.PirateNotInTeamException;
 import com.hush0k.pirateTeam.exception.team.TeamNotFoundException;
+import com.hush0k.pirateTeam.pirate.enums.Freedom;
 import com.hush0k.pirateTeam.team.client.PirateFeignClient;
 import com.hush0k.pirateTeam.team.client.dto.CaptainClientDto;
 import com.hush0k.pirateTeam.team.domain.Team;
@@ -95,6 +97,11 @@ public class TeamMembersService {
         }
 
         CaptainClientDto rebel = pirateFeignClient.getPirateById(rebelId);
+
+        if (rebel.freedom() == Freedom.PRISONER) {
+            throw new PirateIsPrisoner(rebelId);
+        }
+
         CaptainClientDto captain = pirateFeignClient.getPirateById(team.getCapitanId());
 
 

@@ -73,6 +73,13 @@ public class ShipController {
         return shipService.getAll();
     }
 
+    @GetMapping("/market")
+    @Operation(summary = "Get ships available for sale")
+    @ApiResponse(responseCode = "200", description = "List of ships available for sale")
+    public List<ShipResponseDto> showMarket() {
+        return shipService.showMarket();
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get a ship by ID")
     @ApiResponses({

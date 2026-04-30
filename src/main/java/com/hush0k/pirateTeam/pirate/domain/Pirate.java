@@ -1,6 +1,7 @@
 package com.hush0k.pirateTeam.pirate.domain;
 
 import com.hush0k.pirateTeam.pirate.enums.Country;
+import com.hush0k.pirateTeam.pirate.enums.Freedom;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
 import jakarta.persistence.*;
 import lombok.*;
@@ -69,6 +70,11 @@ public class Pirate {
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name="country", columnDefinition = "country_enum")
     private Country country;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name="freedom", columnDefinition = "freedom_enum")
+    private Freedom freedom;
 
     @Column(name="created_at")
     private LocalDateTime createdAt;

@@ -25,6 +25,12 @@ public class Fleet {
     @Column(name="owner_id", nullable = false)
     private UUID ownerId;
 
+    @Column(name="ammo")
+    private int ammo;
+
+    @Column(name="provision")
+    private int provision;
+
     @Column(name="created_at")
     private LocalDateTime createdAt;
 

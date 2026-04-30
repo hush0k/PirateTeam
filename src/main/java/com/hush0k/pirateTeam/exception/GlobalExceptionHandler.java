@@ -100,6 +100,14 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), request);
     }
 
+    @ExceptionHandler(PirateIsPrisoner.class)
+    public ResponseEntity<ErrorResponse> handlePirateIsPrisoner(
+            PirateIsPrisoner e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), request);
+    }
+
     @ExceptionHandler(InsufficientTreasuryException.class)
     public ResponseEntity<ErrorResponse> handleInsufficientTreasuryException(
             InsufficientTreasuryException e,

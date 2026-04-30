@@ -14,7 +14,7 @@ import java.util.UUID;
 )
 public interface TeamClientService {
 
-    @GetMapping("api/teams/{id}")
+    @GetMapping("/api/teams/{id}")
     public TeamDto getTeam(@PathVariable UUID id);
 
     @GetMapping("/api/teams/by-fleet/{fleetId}")

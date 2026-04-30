@@ -186,6 +186,10 @@ public class ShipService {
         return shipMapper.toShipDto(updatedShip);
     }
 
+    public List<ShipResponseDto> showMarket(){
+        return shipMapper.toShipDtoList(shipRepository.getByOwnership(ShipOwnership.AVAILABLE_FOR_SALE));
+    }
+
 
 
 }

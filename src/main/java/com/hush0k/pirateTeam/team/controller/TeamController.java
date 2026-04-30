@@ -1,6 +1,10 @@
 package com.hush0k.pirateTeam.team.controller;
 
 import com.hush0k.pirateTeam.auth.service.JwtService;
+import com.hush0k.pirateTeam.exception.pirate.PirateIsPrisoner;
+import com.hush0k.pirateTeam.exception.pirate.PirateNotFoundException;
+import com.hush0k.pirateTeam.pirate.enums.Freedom;
+import com.hush0k.pirateTeam.pirate.repository.PirateRepository;
 import com.hush0k.pirateTeam.team.dto.request.*;
 import com.hush0k.pirateTeam.team.dto.response.CoupResultResponse;
 import com.hush0k.pirateTeam.team.dto.response.TeamResponseDto;
@@ -31,6 +35,7 @@ public class TeamController {
     private final TeamService teamService;
     private final TeamMembersService teamMembersService;
     private final JwtService jwtService;
+    private final PirateRepository pirateRepository;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -198,6 +203,7 @@ public class TeamController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Pirate left the team successfully"),
             @ApiResponse(responseCode = "400", description = "Pirate is not in team or captain cannot leave"),
+            @ApiResponse(responseCode = "403", description = "Prisoner pirate cannot leave the team"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Team not found")
     })
@@ -206,6 +212,13 @@ public class TeamController {
             HttpServletRequest request
     ) {
         UUID pirateId = getCurrentPirateId(request);
+
+        if (pirateRepository.findById(pirateId)
+                .orElseThrow(() -> new PirateNotFoundException(pirateId))
+                .getFreedom() != Freedom.FREE) {
+            throw new PirateIsPrisoner(pirateId);
+        }
+
         return teamMembersService.removePirate(id, new TeamMembersChangeDto(Set.of(pirateId)));
     }
 
