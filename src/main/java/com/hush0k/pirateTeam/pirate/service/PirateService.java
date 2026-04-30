@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PirateService {
 
+    private static final int MAX_CHARACTERISTIC_VALUE = 100;
+
     private final PirateRepository pirateRepository;
     private final PirateMapper pirateMapper;
     private final PasswordEncoder passwordEncoder;
@@ -125,7 +127,7 @@ public class PirateService {
     public PirateResponseDto addReputation(UUID id, PirateReputationChange dto) {
         log.info("Adding reputation {} to pirate with id: {}", dto.reputation(), id);
         Pirate pirate = getExisting(id);
-        pirate.setReputation(pirate.getReputation() + dto.reputation());
+        pirate.setReputation(capCharacteristic(pirate.getReputation() + dto.reputation()));
         Pirate updatedPirate = pirateRepository.save(pirate);
         log.info("Pirate reputation changed successfully for pirate id: {}", id);
         return pirateMapper.toPirateResponseDto(updatedPirate);
@@ -165,7 +167,7 @@ public class PirateService {
     public PirateResponseDto addBloodlust(UUID id, PirateBloodlustChangeDto dto) {
         log.info("Adding {} bloodlust to pirate {}", dto.amount(), id);
         Pirate pirate = getExisting(id);
-        pirate.setBloodlust(pirate.getBloodlust() + dto.amount());
+        pirate.setBloodlust(capCharacteristic(pirate.getBloodlust() + dto.amount()));
         Pirate updatedPirate = pirateRepository.save(pirate);
         log.info("Pirate bloodlust changed successfully for pirate id: {}", id);
         return pirateMapper.toPirateResponseDto(updatedPirate);
@@ -183,7 +185,7 @@ public class PirateService {
     public PirateResponseDto addIntelligence(UUID id, PirateIntelligenceChangeDto dto) {
         log.info("Adding {} intelligence to pirate {}", dto.amount(), id);
         Pirate pirate = getExisting(id);
-        pirate.setIntelligence(pirate.getIntelligence() + dto.amount());
+        pirate.setIntelligence(capCharacteristic(pirate.getIntelligence() + dto.amount()));
         Pirate updatedPirate = pirateRepository.save(pirate);
         log.info("Pirate intelligence changed successfully for pirate id: {}", id);
         return pirateMapper.toPirateResponseDto(updatedPirate);
@@ -201,7 +203,7 @@ public class PirateService {
     public PirateResponseDto addStrength(UUID id, PirateStrengthChangeDto dto) {
         log.info("Adding {} strength to pirate {}", dto.amount(), id);
         Pirate pirate = getExisting(id);
-        pirate.setStrength(pirate.getStrength() + dto.amount());
+        pirate.setStrength(capCharacteristic(pirate.getStrength() + dto.amount()));
         Pirate updatedPirate = pirateRepository.save(pirate);
         log.info("Pirate strength changed successfully for pirate id: {}", id);
         return pirateMapper.toPirateResponseDto(updatedPirate);
@@ -214,6 +216,10 @@ public class PirateService {
         Pirate updatedPirate = pirateRepository.save(pirate);
         log.info("Pirate strength changed successfully for pirate id: {}", id);
         return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    private int capCharacteristic(int value) {
+        return Math.min(MAX_CHARACTERISTIC_VALUE, value);
     }
 
 }

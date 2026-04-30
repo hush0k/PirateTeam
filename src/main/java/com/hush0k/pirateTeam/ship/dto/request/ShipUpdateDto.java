@@ -18,15 +18,15 @@ public record ShipUpdateDto(
         ShipType shipType,
 
         @Positive(message = "Max crew must be positive")
-        int maxCrew,
+        Integer maxCrew,
 
         @Positive(message = "Max speed must be positive")
-        float maxSpeed,
+        Float maxSpeed,
 
         Country builderCountry,
 
         @Positive(message = "Cargo capacity must be positive")
-        int cargoCapacity,
+        Integer cargoCapacity,
 
         @PositiveOrZero(message = "Цена не может быть отрицательной")
         Integer price

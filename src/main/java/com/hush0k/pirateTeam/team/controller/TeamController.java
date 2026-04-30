@@ -1,7 +1,10 @@
 package com.hush0k.pirateTeam.team.controller;
 
+import com.hush0k.pirateTeam.auth.service.JwtService;
 import com.hush0k.pirateTeam.team.dto.request.*;
+import com.hush0k.pirateTeam.team.dto.response.CoupResultResponse;
 import com.hush0k.pirateTeam.team.dto.response.TeamResponseDto;
+import com.hush0k.pirateTeam.team.service.TeamMembersService;
 import com.hush0k.pirateTeam.team.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,12 +12,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -24,6 +29,8 @@ import java.util.UUID;
 public class TeamController {
 
     private final TeamService teamService;
+    private final TeamMembersService teamMembersService;
+    private final JwtService jwtService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -155,7 +162,7 @@ public class TeamController {
             @Parameter(description = "Team UUID") @PathVariable UUID id,
             @Valid @RequestBody TeamMembersChangeDto dto
     ) {
-        return teamService.addNewPirate(id, dto);
+        return teamMembersService.addNewPirate(id, dto);
     }
 
     @PatchMapping("/{id}/pirates/remove")
@@ -170,7 +177,45 @@ public class TeamController {
             @Parameter(description = "Team UUID") @PathVariable UUID id,
             @Valid @RequestBody TeamMembersChangeDto dto
     ) {
-        return teamService.removePirate(id, dto);
+        return teamMembersService.removePirate(id, dto);
+    }
+
+    @PostMapping("/{id}/leave")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Leave the team as current pirate", security = @SecurityRequirement(name = "Bearer Auth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate left the team successfully"),
+            @ApiResponse(responseCode = "400", description = "Pirate is not in team or captain cannot leave"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Team not found")
+    })
+    public TeamResponseDto leaveTeam(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            HttpServletRequest request
+    ) {
+        UUID pirateId = getCurrentPirateId(request);
+        return teamMembersService.removePirate(id, new TeamMembersChangeDto(Set.of(pirateId)));
+    }
+
+    @PostMapping("/{id}/coup/{rebelId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Start a coup in the team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Coup attempt completed"),
+            @ApiResponse(responseCode = "400", description = "Invalid coup attempt"),
+            @ApiResponse(responseCode = "404", description = "Team or pirate not found")
+    })
+    public CoupResultResponse startCoup(
+            @Parameter(description = "Team UUID") @PathVariable UUID id,
+            @Parameter(description = "Rebel pirate UUID") @PathVariable UUID rebelId
+    ) {
+        return teamMembersService.startCoup(rebelId, id);
+    }
+
+    private UUID getCurrentPirateId(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        String token = authHeader.substring(7);
+        return jwtService.extractPirateId(token);
     }
 
     @PatchMapping("/{id}/morale/add")

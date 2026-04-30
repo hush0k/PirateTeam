@@ -1,5 +1,6 @@
 package com.hush0k.pirateTeam.exception;
 
+import com.hush0k.pirateTeam.exception.fleet.FleetNotFoundException;
 import com.hush0k.pirateTeam.exception.island.IslandNotFoundException;
 import com.hush0k.pirateTeam.exception.pirate.InsufficientPirateTreasuryException;
 import com.hush0k.pirateTeam.exception.pirate.PirateInvalidRankException;
@@ -49,6 +50,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ShipNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleShipNotFoundException(
             ShipNotFoundException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(FleetNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleFleetNotFoundException(
+            FleetNotFoundException e,
             HttpServletRequest request
     ) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);

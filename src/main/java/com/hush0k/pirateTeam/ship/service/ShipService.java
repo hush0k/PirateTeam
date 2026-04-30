@@ -52,7 +52,7 @@ public class ShipService {
         log.info("Assigning captain {} to ship {}", captainId, shipId);
         PirateClientDto pirate = pirateFeignClient.getPirateById(captainId);
 
-        if (pirate.rank().isHigherThan(Rank.NAVIGATOR)) {
+        if (!pirate.rank().isHigherThan(Rank.NAVIGATOR)) {
             throw new PirateNotCaptainException(captainId);
         }
 
