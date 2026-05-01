@@ -254,6 +254,36 @@ public class PirateController {
         return pirateService.removeStrength(id, dto);
     }
 
+    @PatchMapping("/{id}/exp/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add exp to pirate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate exp increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto addExp(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateExpChangeDto dto
+    ) {
+        return pirateService.addExp(id, dto);
+    }
+
+    @PatchMapping("/{id}/exp/remove")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Remove exp from pirate")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate exp reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto removeExp(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Valid @RequestBody PirateExpChangeDto dto
+    ) {
+        return pirateService.removeExp(id, dto);
+    }
+
 
     @PatchMapping("/team/{teamId}/bulk")
     @ResponseStatus(HttpStatus.NO_CONTENT)

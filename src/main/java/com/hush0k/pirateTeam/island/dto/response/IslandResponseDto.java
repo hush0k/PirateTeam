@@ -1,6 +1,7 @@
 package com.hush0k.pirateTeam.island.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hush0k.pirateTeam.island.enums.DefenceType;
 import com.hush0k.pirateTeam.island.enums.IslandLevel;
 import com.hush0k.pirateTeam.island.enums.IslandLocation;
 
@@ -15,6 +16,7 @@ public record IslandResponseDto(
         double area,
         int coordinateX,
         int coordinateY,
+        DefenceType defenseType,
         IslandLocation location,
         UUID ownerId,
         int population,

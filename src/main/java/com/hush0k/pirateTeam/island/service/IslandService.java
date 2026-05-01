@@ -1,6 +1,7 @@
 package com.hush0k.pirateTeam.island.service;
 
 import com.hush0k.pirateTeam.exception.island.IslandNotFoundException;
+import com.hush0k.pirateTeam.island.client.PirateClientService;
 import com.hush0k.pirateTeam.island.domain.Island;
 import com.hush0k.pirateTeam.island.dto.request.IslandCreateDto;
 import com.hush0k.pirateTeam.island.dto.request.IslandUpdateDto;
@@ -23,9 +24,10 @@ public class IslandService {
 
     private final IslandRepository islandRepository;
     private final IslandMapper islandMapper;
+    private final PirateClientService  pirateClientService;
 
     @Transactional(readOnly = true)
-    private Island getExisting(UUID id) {
+    public Island getExisting(UUID id) {
         log.debug("Fetching island with id: {}", id);
         return islandRepository.findById(id).orElseThrow(
                 () -> {
@@ -39,8 +41,10 @@ public class IslandService {
         log.info("Creating new island with name: {}", dto.name());
         Island island = islandMapper.toIsland(dto);
         Island savedIsland = islandRepository.save(island);
-        log.info("Island created successfully with id: {}", savedIsland.getId());
-        return islandMapper.toIslandResponseDto(savedIsland);
+        calculateStatistics(savedIsland.getId());
+        Island updatedIsland = islandRepository.save(island);
+        log.info("Island created successfully with id: {}", updatedIsland.getId());
+        return islandMapper.toIslandResponseDto(updatedIsland);
     }
 
     public IslandResponseDto update(IslandUpdateDto dto, UUID id) {
@@ -60,7 +64,7 @@ public class IslandService {
     }
 
     @Transactional(readOnly = true)
-    public IslandResponseDto findById(UUID id) {
+    public IslandResponseDto getById(UUID id) {
         log.debug("Fetching island by id: {}", id);
         Island island = getExisting(id);
         return islandMapper.toIslandResponseDto(island);
@@ -72,5 +76,44 @@ public class IslandService {
         List<Island> islands = islandRepository.findAll();
         log.debug("Found {} islands", islands.size());
         return islandMapper.toIslandResponseDtoList(islands);
+    }
+
+    public void calculateStatistics(UUID id) {
+        log.debug("Calculating statistics for island with id: {}", id);
+        Island island = getExisting(id);
+
+        int population = 100 * island.getLevel().getPopulationMultiplier();
+        population = (int)(island.getTaxPercentage() == 1 ? population * 1.8 :
+                island.getTaxPercentage() < 1.3 ? population * 1.5 :
+                island.getTaxPercentage() < 1.6 ? population * 1.2 :
+                island.getTaxPercentage() < 2.0 ? population :
+                island.getTaxPercentage() < 2.3 ? population * 0.8 :
+                island.getTaxPercentage() < 2.7 ? population * 0.5 :
+                island.getTaxPercentage() < 3.0 ? population * 0.2 :
+                population * 0.0);
+
+        int traffic = island.getShipTrafficPerDay();
+        double multiplier = 1.0 + Math.min(traffic / 5, 9) * 0.1;
+        population = (int)(population * multiplier);
+
+        int goldTurnover = population * 3 + traffic * 50;
+
+        island.setGoldTurnover(goldTurnover);
+        island.setPopulation(population);
+
+        Island updatedIsland = islandRepository.save(island);
+        log.info("Island updated successfully with id: {}", updatedIsland.getId());
+        islandMapper.toIslandResponseDto(updatedIsland);
+    }
+
+
+    public IslandResponseDto assignNewOwner(UUID islandId, UUID ownerId){
+        Island island = getExisting(islandId);
+        pirateClientService.getPirate(ownerId);
+
+        island.setOwnerId(ownerId);
+        Island updatedIsland = islandRepository.save(island);
+        log.info("Island assigned successfully with id: {}", island.getId());
+        return islandMapper.toIslandResponseDto(updatedIsland);
     }
 }

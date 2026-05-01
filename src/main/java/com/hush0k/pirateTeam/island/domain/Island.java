@@ -1,5 +1,6 @@
 package com.hush0k.pirateTeam.island.domain;
 
+import com.hush0k.pirateTeam.island.enums.DefenceType;
 import com.hush0k.pirateTeam.island.enums.IslandLevel;
 import com.hush0k.pirateTeam.island.enums.IslandLocation;
 import jakarta.persistence.*;
@@ -74,8 +75,8 @@ public class Island {
     @Builder.Default
     private Set<UUID> legendaryPirateIds = new HashSet<>();
 
-    @Column(name="defense_power")
-    private int defensePower;
+    @Column(name="defense_type")
+    private DefenceType  defenseType;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

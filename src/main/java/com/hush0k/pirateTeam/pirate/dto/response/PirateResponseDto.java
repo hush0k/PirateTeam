@@ -22,6 +22,7 @@ public record PirateResponseDto(
         int bloodlust,
         int intelligence,
         int strength,
+        int exp,
         UUID homeIslandId,
         Country country,
 

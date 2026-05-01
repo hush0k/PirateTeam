@@ -58,6 +58,9 @@ public class Pirate {
     @Column(name="strength")
     private int strength;
 
+    @Column(name = "exp")
+    private int exp;
+
     @Column(name="home_island_id")
     private UUID homeIslandId;
 

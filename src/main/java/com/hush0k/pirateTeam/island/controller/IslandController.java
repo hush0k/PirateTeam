@@ -81,6 +81,33 @@ public class IslandController {
     public IslandResponseDto get(
             @Parameter(description = "Island UUID") @PathVariable UUID id
     ) {
-        return islandService.findById(id);
+        return islandService.getById(id);
+    }
+
+    @PatchMapping("/{islandId}/owner/{ownerId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Assign a new owner to island")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Owner assigned successfully"),
+            @ApiResponse(responseCode = "404", description = "Island or pirate not found")
+    })
+    public IslandResponseDto assignNewOwner(
+            @Parameter(description = "Island UUID") @PathVariable UUID islandId,
+            @Parameter(description = "Pirate UUID") @PathVariable UUID ownerId
+    ) {
+        return islandService.assignNewOwner(islandId, ownerId);
+    }
+
+    @PostMapping("/{id}/statistics/calculate")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Recalculate island population and gold turnover")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Island statistics recalculated successfully"),
+            @ApiResponse(responseCode = "404", description = "Island not found")
+    })
+    public void calculateStatistics(
+            @Parameter(description = "Island UUID") @PathVariable UUID id
+    ) {
+        islandService.calculateStatistics(id);
     }
 }

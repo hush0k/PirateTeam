@@ -4,7 +4,10 @@ import com.hush0k.pirateTeam.exception.fleet.FleetNotFoundException;
 import com.hush0k.pirateTeam.exception.fleet.InsufficientDistanceToBattle;
 import com.hush0k.pirateTeam.exception.fleet.InsufficientPirateSpaceException;
 import com.hush0k.pirateTeam.exception.fleet.InsufficientProvisionException;
+import com.hush0k.pirateTeam.exception.island.IslandNotOwnerException;
 import com.hush0k.pirateTeam.exception.island.IslandNotFoundException;
+import com.hush0k.pirateTeam.exception.island.IslandNotRequiredLevelException;
+import com.hush0k.pirateTeam.exception.island.InsufficientDistanceToFinishOperationException;
 import com.hush0k.pirateTeam.exception.pirate.*;
 import com.hush0k.pirateTeam.exception.ship.*;
 import com.hush0k.pirateTeam.exception.team.*;
@@ -53,6 +56,30 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(IslandNotOwnerException.class)
+    public ResponseEntity<ErrorResponse> handleIslandNotOwnerException(
+            IslandNotOwnerException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(IslandNotRequiredLevelException.class)
+    public ResponseEntity<ErrorResponse> handleIslandNotRequiredLevelException(
+            IslandNotRequiredLevelException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
+    @ExceptionHandler(InsufficientDistanceToFinishOperationException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientDistanceToFinishOperationException(
+            InsufficientDistanceToFinishOperationException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 
     @ExceptionHandler(ShipNotFoundException.class)

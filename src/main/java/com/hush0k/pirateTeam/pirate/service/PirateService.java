@@ -218,6 +218,24 @@ public class PirateService {
         return pirateMapper.toPirateResponseDto(updatedPirate);
     }
 
+    public PirateResponseDto addExp(UUID id, PirateExpChangeDto dto) {
+        log.info("Adding {} exp to pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setExp(pirate.getExp() + dto.amount());
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate exp increased successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
+    public PirateResponseDto removeExp(UUID id, PirateExpChangeDto dto) {
+        log.info("Removing {} exp from pirate {}", dto.amount(), id);
+        Pirate pirate = getExisting(id);
+        pirate.setExp(Math.max(0, pirate.getExp() - dto.amount()));
+        Pirate updatedPirate = pirateRepository.save(pirate);
+        log.info("Pirate exp reduced successfully for pirate id: {}", id);
+        return pirateMapper.toPirateResponseDto(updatedPirate);
+    }
+
     private int capCharacteristic(int value) {
         return Math.min(MAX_CHARACTERISTIC_VALUE, value);
     }
