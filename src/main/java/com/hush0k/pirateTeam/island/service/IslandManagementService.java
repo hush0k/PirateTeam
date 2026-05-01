@@ -124,7 +124,7 @@ public class IslandManagementService {
 
     public void checkOwner(UUID id, UUID ownerId) {
         Island island = islandService.getExisting(id);
-        if (island.getOwnerId().equals(ownerId)) {
+        if (!island.getOwnerId().equals(ownerId)) {
             throw new IslandNotOwnerException(id, ownerId);
         }
     }
