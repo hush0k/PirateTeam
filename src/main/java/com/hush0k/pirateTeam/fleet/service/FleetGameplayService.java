@@ -199,6 +199,9 @@ public class FleetGameplayService {
         if (fleet.isHasTreasuryMap()){
             center = (int) (randomService.simpleRandom(30, 70) * 1.6);
             center = randomService.clamp(center, 5, 97);
+        } else {
+            center = (int) (randomService.simpleRandom(30, 70));
+            center = randomService.clamp(center, 5, 97);
         }
 
         result = randomService.weightedAround(0, 100, center, 2.0D);
