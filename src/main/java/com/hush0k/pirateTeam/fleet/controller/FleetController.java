@@ -1,10 +1,14 @@
 package com.hush0k.pirateTeam.fleet.controller;
 
 import com.hush0k.pirateTeam.fleet.dto.request.FleetCreateDto;
+import com.hush0k.pirateTeam.fleet.dto.request.FleetMoveDto;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetResourceChangeDto;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetUpdateDto;
+import com.hush0k.pirateTeam.fleet.dto.response.FleetAttackResult;
+import com.hush0k.pirateTeam.fleet.dto.response.FleetNewCoordinate;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetResponseDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetStatsDto;
+import com.hush0k.pirateTeam.fleet.service.FleetGameplayService;
 import com.hush0k.pirateTeam.fleet.service.FleetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,6 +32,8 @@ import java.util.UUID;
 public class FleetController {
 
     private final FleetService fleetService;
+    private final FleetGameplayService fleetGameplayService;
+
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -173,4 +179,35 @@ public class FleetController {
     ) {
         return fleetService.withdrawProvision(id, dto);
     }
+
+    @PostMapping("/{fleetId}/move")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Move fleet to target coordinates")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fleet moved successfully"),
+            @ApiResponse(responseCode = "400", description = "Not enough provision"),
+            @ApiResponse(responseCode = "404", description = "Fleet not found")
+    })
+    public FleetNewCoordinate moveToTarget(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID fleetId,
+            @Valid @RequestBody FleetMoveDto dto
+    ) {
+        return fleetGameplayService.moveToTarget(fleetId, dto);
+    }
+
+    @PostMapping("/{fleetId}/attack/{enemyFleetId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Attack enemy fleet")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Battle completed"),
+            @ApiResponse(responseCode = "400", description = "Not enough ammo or enemy out of range"),
+            @ApiResponse(responseCode = "404", description = "Fleet not found")
+    })
+    public FleetAttackResult attackToEnemyFleet(
+            @Parameter(description = "Attacking fleet UUID") @PathVariable UUID fleetId,
+            @Parameter(description = "Enemy fleet UUID") @PathVariable UUID enemyFleetId
+    ) {
+        return fleetGameplayService.attackToEnemyFleet(fleetId, enemyFleetId);
+    }
+
 }

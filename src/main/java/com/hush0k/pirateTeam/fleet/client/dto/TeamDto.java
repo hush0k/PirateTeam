@@ -8,7 +8,7 @@ public record TeamDto(
         UUID id,
         String name,
         UUID capitanId,
-        Optional<Set<UUID>> pirateIds,
+        Set<UUID> pirateIds,
         int treasury,
         int reputation,
         int cohesion,

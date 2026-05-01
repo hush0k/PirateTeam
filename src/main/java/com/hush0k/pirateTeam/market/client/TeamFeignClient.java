@@ -15,7 +15,7 @@ import java.util.UUID;
 public interface TeamFeignClient {
 
     @GetMapping("/api/teams/{id}")
-    TeamClientDto getTeamById(String id);
+    TeamClientDto getTeamById(@PathVariable UUID id);
 
     @GetMapping("/api/teams/by-fleet/{fleetId}")
     TeamClientDto getByFleetId(@PathVariable UUID fleetId);

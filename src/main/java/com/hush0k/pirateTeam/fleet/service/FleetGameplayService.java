@@ -4,21 +4,20 @@ import com.hush0k.pirateTeam.common.random.RandomService;
 import com.hush0k.pirateTeam.exception.fleet.InsufficientAmmoException;
 import com.hush0k.pirateTeam.exception.fleet.InsufficientDistanceToBattle;
 import com.hush0k.pirateTeam.exception.fleet.InsufficientProvisionException;
+import com.hush0k.pirateTeam.fleet.client.PirateClientService;
 import com.hush0k.pirateTeam.fleet.client.TeamClientService;
+import com.hush0k.pirateTeam.fleet.client.dto.PirateClientDto;
 import com.hush0k.pirateTeam.fleet.client.dto.TeamDto;
 import com.hush0k.pirateTeam.fleet.client.dto.TeamTreasuryCharacteristicClient;
 import com.hush0k.pirateTeam.fleet.domain.Fleet;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetMoveDto;
-import com.hush0k.pirateTeam.fleet.dto.response.FleetAttackResult;
-import com.hush0k.pirateTeam.fleet.dto.response.FleetNewCoordinate;
-import com.hush0k.pirateTeam.fleet.dto.response.FleetStatsDto;
+import com.hush0k.pirateTeam.fleet.dto.response.*;
 import com.hush0k.pirateTeam.fleet.repository.FleetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -31,6 +30,7 @@ public class FleetGameplayService {
     private final RandomService  randomService;
     private final FleetService fleetService;
     private final TeamClientService teamClientService;
+    private final PirateClientService pirateClientService;
 
     public int calculateDistance(int x1, int y1, int x2, int y2) {
         return (int) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
@@ -41,7 +41,7 @@ public class FleetGameplayService {
         int distance = calculateDistance(fleet.getCoordinateX(), fleet.getCoordinateY(), dto.coordinateX(), dto.coordinateY());
 
         TeamDto team = teamClientService.getByFleetId(fleetId);
-        int teamSize = team.pirateIds().map(Set::size).orElse(0);
+        int teamSize = team.pirateIds().size();
 
         int spentProvision = (int)(teamSize * 0.5 * distance);
 
@@ -97,13 +97,20 @@ public class FleetGameplayService {
         int enemyFleetRating = (int) Math.clamp(Math.round(enemyScore * 49) + 1, 1, 50);
 
         if (enemySpentAmmo > enemyFleet.getAmmo()){
-            myFleetRating = (int)(myFleetRating * 0.9);
+            myFleetRating = (int)(enemyFleetRating * 0.9);
             enemyFleet.setAmmo(0);
+        } else {
+            enemyFleet.setAmmo(enemyFleet.getAmmo() - enemySpentAmmo);
         }
-        enemyFleet.setAmmo(enemyFleet.getAmmo() - enemySpentAmmo);
 
-        myFleetRating = (int)(myFleetRating * (1 - 0.005 * myTeam.fatigue()));
-        enemyFleetRating *= (int)(1 - 0.005 * enemyTeam.fatigue());
+        PirateClientDto myCaptain = pirateClientService.getPirate(myFleet.getOwnerId());
+        PirateClientDto enemyCaptain = pirateClientService.getPirate(enemyFleet.getOwnerId());
+
+        myFleetRating =
+                (int)(myFleetRating * (1 - 0.005 * myTeam.fatigue()) * (1 + 0.003) * (myCaptain.intelligence()*0.6 + myCaptain.strength()*0.2 + myCaptain.bloodlust()*0.2));
+        enemyFleetRating =
+                (int)(enemyFleetRating * (1 - 0.005 * enemyTeam.fatigue()) * (1 + 0.003) * (enemyCaptain.intelligence()*0.6 + enemyCaptain.strength()*0.2 + enemyCaptain.bloodlust()*0.2));
+
 
         int center = 50 + (int) myFleetRating - (int) enemyFleetRating;
         int result = randomService.weightedAround(0, 100, center, 2.5D);
@@ -129,6 +136,17 @@ public class FleetGameplayService {
             teamClientService.withdrawMoraleToTeam(enemyTeam.id(),
                     new TeamTreasuryCharacteristicClient(4));
 
+            myTeam.pirateIds().forEach(pirateId -> {
+                int amount = randomService.simpleRandom(3,10);
+                pirateClientService.addReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+            });
+
+            enemyTeam.pirateIds().forEach(pirateId -> {
+                int amount = randomService.simpleRandom(3,10);
+                pirateClientService.removeReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+            });
+
+
 
         } else if (result < 50) {
             winnerName = enemyFleet.getName();
@@ -147,6 +165,15 @@ public class FleetGameplayService {
             teamClientService.withdrawMoraleToTeam(myTeam.id(),
                     new TeamTreasuryCharacteristicClient(4));
 
+            enemyTeam.pirateIds().forEach(pirateId -> {
+                int amount = randomService.simpleRandom(3,10);
+                pirateClientService.addReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+            });
+
+            myTeam.pirateIds().forEach(pirateId -> {
+                int amount = randomService.simpleRandom(3,10);
+                pirateClientService.removeReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+            });
 
         } else {
             winnerName = "Draw";
@@ -162,5 +189,49 @@ public class FleetGameplayService {
 
         return new FleetAttackResult(fleetId, enemyFleetId, winnerName, result, myFatigue, mySpentAmmo, lootedTreasury);
 
+    }
+
+    public FleetFindTreasure findTreasury(UUID id){
+        Fleet fleet = fleetService.getExisting(id);
+        int result;
+        int center = 0;
+
+        if (fleet.isHasTreasuryMap()){
+            center = (int) (randomService.simpleRandom(30, 70) * 1.6);
+            center = randomService.clamp(center, 5, 97);
+        }
+
+        result = randomService.weightedAround(0, 100, center, 2.0D);
+
+        int treasury = calculateTreasury(result);
+        TeamDto team = teamClientService.getByFleetId(id);
+
+        teamClientService.addTreasuryToTeam(team.id(), new TeamTreasuryCharacteristicClient(result));
+
+        team.pirateIds().forEach(pirateId -> {
+            int amount = randomService.simpleRandom(3,6);
+            pirateClientService.addReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+        });
+
+        return new FleetFindTreasure(team.id(), treasury);
+
+    }
+
+    public FleetCaptureIsland captureIsland(UUID fleetId, UUID islandId){
+
+    }
+
+    private int calculateTreasury(int result) {
+        return result == 0   ? 0
+                : result < 5    ? 300
+                  : result < 10   ? 1000
+                    : result < 20   ? 5000
+                      : result < 50   ? 10000
+                        : result < 70   ? 20000
+                          : result < 80   ? 30000
+                            : result < 90   ? 40000
+                              : result < 95   ? 50000
+                                : result < 99   ? 60000
+                                  : 100000;
     }
 }

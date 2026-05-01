@@ -74,6 +74,9 @@ public class Island {
     @Builder.Default
     private Set<UUID> legendaryPirateIds = new HashSet<>();
 
+    @Column(name="defense_power")
+    private int defensePower;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

@@ -41,12 +41,15 @@ public class FleetService {
             return fleetIsExists.get();
         }
 
-        PirateClientDto teamId = teamClientService.getPirateById(dto.ownerId());
-
         log.info("Creating new fleet for owner: {}", dto.ownerId());
         Fleet fleet = fleetMapper.toFleet(dto);
-        teamClientService.assignFleetToTeam(dto.ownerId(), teamId.teamId());
         Fleet savedFleet = fleetRepository.save(fleet);
+
+        PirateClientDto pirate = teamClientService.getPirateById(dto.ownerId());
+        if (pirate.teamId() != null) {
+            teamClientService.assignFleetToTeam(pirate.teamId(), savedFleet.getId());
+        }
+
         log.info("Fleet created successfully with id: {}", savedFleet.getId());
         return fleetMapper.toFleetResponseDto(savedFleet);
     }

@@ -37,6 +37,9 @@ public class Fleet {
     @Column(name="coordinate_y")
     private int coordinateY;
 
+    @Column(name="has_treasury_map")
+    private boolean hasTreasuryMap;
+
     @Column(name="created_at")
     private LocalDateTime createdAt;
 
