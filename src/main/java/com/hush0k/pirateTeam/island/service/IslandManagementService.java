@@ -10,6 +10,7 @@ import com.hush0k.pirateTeam.island.client.PirateClientService;
 import com.hush0k.pirateTeam.island.client.dto.FleetClientDto;
 import com.hush0k.pirateTeam.island.client.dto.PirateClientDto;
 import com.hush0k.pirateTeam.island.domain.Island;
+import com.hush0k.pirateTeam.island.dto.request.IslandTaxChangeDto;
 import com.hush0k.pirateTeam.island.dto.response.IslandResponseDto;
 import com.hush0k.pirateTeam.island.dto.response.PayCheckDto;
 import com.hush0k.pirateTeam.island.enums.IslandLevel;
@@ -100,7 +101,26 @@ public class IslandManagementService {
 
         island.setShipTrafficPerDay(island.getShipTrafficPerDay() + 1);
 
+        Island updatedIsland = islandRepository.save(island);
+        return islandMapper.toIslandResponseDto(updatedIsland);
     }
+
+    public IslandResponseDto addTax(UUID id, UUID ownerId, IslandTaxChangeDto dto) {
+        Island island = islandService.getExisting(id);
+        checkOwner(id, ownerId);
+        island.setTaxPercentage(island.getTaxPercentage() + dto.amount());
+        Island updatedIsland = islandRepository.save(island);
+        return islandMapper.toIslandResponseDto(updatedIsland);
+    }
+
+    public IslandResponseDto withdrawTax(UUID id, UUID ownerId, IslandTaxChangeDto dto) {
+        Island island = islandService.getExisting(id);
+        checkOwner(id, ownerId);
+        island.setTaxPercentage(Math.max(0, island.getTaxPercentage() - dto.amount()));
+        Island updatedIsland = islandRepository.save(island);
+        return islandMapper.toIslandResponseDto(updatedIsland);
+    }
+
 
     public void checkOwner(UUID id, UUID ownerId) {
         Island island = islandService.getExisting(id);

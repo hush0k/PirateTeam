@@ -1,8 +1,10 @@
 package com.hush0k.pirateTeam.island.controller;
 
 import com.hush0k.pirateTeam.island.dto.request.IslandCreateDto;
+import com.hush0k.pirateTeam.island.dto.request.IslandTaxChangeDto;
 import com.hush0k.pirateTeam.island.dto.request.IslandUpdateDto;
 import com.hush0k.pirateTeam.island.dto.response.IslandResponseDto;
+import com.hush0k.pirateTeam.island.service.IslandManagementService;
 import com.hush0k.pirateTeam.island.service.IslandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +27,7 @@ import java.util.UUID;
 public class IslandController {
 
     private final IslandService islandService;
+    private final IslandManagementService islandManagementService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -109,5 +112,35 @@ public class IslandController {
             @Parameter(description = "Island UUID") @PathVariable UUID id
     ) {
         islandService.calculateStatistics(id);
+    }
+
+    @PatchMapping("/{id}/tax/add")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Add tax percentage to island")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Island tax increased successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Island not found")
+    })
+    public IslandResponseDto addTax(
+            @Parameter(description = "Island UUID") @PathVariable UUID id,
+            @Valid @RequestBody IslandTaxChangeDto dto
+    ) {
+        return islandManagementService.addTax(id, dto);
+    }
+
+    @PatchMapping("/{id}/tax/withdraw")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Withdraw tax percentage from island")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Island tax reduced successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "404", description = "Island not found")
+    })
+    public IslandResponseDto withdrawTax(
+            @Parameter(description = "Island UUID") @PathVariable UUID id,
+            @Valid @RequestBody IslandTaxChangeDto dto
+    ) {
+        return islandManagementService.withdrawTax(id, dto);
     }
 }
