@@ -29,7 +29,15 @@ public class ShipController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Create a new ship")
+    @Operation(description = "SLOOP      → price: 10000,  cargo: 300,  crew: 15,  speed: 14\n" +
+            "BRIGANTINE → price: 22000,  cargo: 500,  crew: 30,  speed: 12\n" +
+            "SCHOONER   → price: 35000,  cargo: 600,  crew: 40,  speed: 11\n" +
+            "BARQUE     → price: 60000,  cargo: 900,  crew: 50,  speed: 8\n" +
+            "FRIGATE    → price: 90000,  cargo: 700,  crew: 80,  speed: 10\n" +
+            "GALLEON    → price: 160000, cargo: 1400, crew: 120, speed: 7\n" +
+            "MAN_OF_WAR → price: 300000, cargo: 1000, crew: 150, speed: 6",
+        summary = "Create a ship"
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Ship created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input data")
