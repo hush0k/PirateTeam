@@ -34,7 +34,7 @@ public class PirateService {
 
     // EXISTS
     @Transactional(readOnly = true)
-    private Pirate getExisting(UUID pirateId) {
+    public Pirate getExisting(UUID pirateId) {
         log.debug("Fetching pirate with id: {}", pirateId);
         return pirateRepository.findById(pirateId).orElseThrow(
                 () -> {
@@ -215,24 +215,6 @@ public class PirateService {
         pirate.setStrength(Math.max(0, pirate.getStrength() - dto.amount()));
         Pirate updatedPirate = pirateRepository.save(pirate);
         log.info("Pirate strength changed successfully for pirate id: {}", id);
-        return pirateMapper.toPirateResponseDto(updatedPirate);
-    }
-
-    public PirateResponseDto addExp(UUID id, PirateExpChangeDto dto) {
-        log.info("Adding {} exp to pirate {}", dto.amount(), id);
-        Pirate pirate = getExisting(id);
-        pirate.setExp(pirate.getExp() + dto.amount());
-        Pirate updatedPirate = pirateRepository.save(pirate);
-        log.info("Pirate exp increased successfully for pirate id: {}", id);
-        return pirateMapper.toPirateResponseDto(updatedPirate);
-    }
-
-    public PirateResponseDto removeExp(UUID id, PirateExpChangeDto dto) {
-        log.info("Removing {} exp from pirate {}", dto.amount(), id);
-        Pirate pirate = getExisting(id);
-        pirate.setExp(Math.max(0, pirate.getExp() - dto.amount()));
-        Pirate updatedPirate = pirateRepository.save(pirate);
-        log.info("Pirate exp reduced successfully for pirate id: {}", id);
         return pirateMapper.toPirateResponseDto(updatedPirate);
     }
 

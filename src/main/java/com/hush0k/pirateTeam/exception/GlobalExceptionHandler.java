@@ -178,6 +178,14 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
     }
 
+    @ExceptionHandler(InsufficientExpForUpgradeException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientExpForUpgradeException(
+            InsufficientExpForUpgradeException e,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), request);
+    }
+
     @ExceptionHandler(PirateNotInTeamException.class)
     public ResponseEntity<ErrorResponse> handlePirateNotInTeamException(
             PirateNotInTeamException e,

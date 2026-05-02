@@ -3,6 +3,7 @@ package com.hush0k.pirateTeam.pirate.controller;
 import com.hush0k.pirateTeam.pirate.dto.request.*;
 import com.hush0k.pirateTeam.pirate.dto.response.PirateResponseDto;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
+import com.hush0k.pirateTeam.pirate.service.PirateGamePlayService;
 import com.hush0k.pirateTeam.pirate.service.PirateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,6 +27,7 @@ import java.util.UUID;
 public class PirateController {
 
     private final PirateService pirateService;
+    private final PirateGamePlayService pirateGamePlayService;
 
 
     @PostMapping
@@ -266,7 +268,7 @@ public class PirateController {
             @Parameter(description = "Pirate UUID") @PathVariable UUID id,
             @Valid @RequestBody PirateExpChangeDto dto
     ) {
-        return pirateService.addExp(id, dto);
+        return pirateGamePlayService.addExp(id, dto);
     }
 
     @PatchMapping("/{id}/exp/remove")
@@ -281,7 +283,66 @@ public class PirateController {
             @Parameter(description = "Pirate UUID") @PathVariable UUID id,
             @Valid @RequestBody PirateExpChangeDto dto
     ) {
-        return pirateService.removeExp(id, dto);
+        return pirateGamePlayService.removeExp(id, dto);
+    }
+
+    @PatchMapping("/{id}/upgrade/bloodlust")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Upgrade pirate bloodlust using exp")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate bloodlust upgraded successfully"),
+            @ApiResponse(responseCode = "400", description = "Not enough exp or invalid amount"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto upgradeBloodlust(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Parameter(description = "Amount to upgrade") @RequestParam int amount
+    ) {
+        return pirateGamePlayService.upgradeBloodlust(id, amount);
+    }
+
+    @PatchMapping("/{id}/upgrade/intelligence")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Upgrade pirate intelligence using exp")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate intelligence upgraded successfully"),
+            @ApiResponse(responseCode = "400", description = "Not enough exp or invalid amount"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto upgradeIntelligence(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Parameter(description = "Amount to upgrade") @RequestParam int amount
+    ) {
+        return pirateGamePlayService.upgradeIntelligence(id, amount);
+    }
+
+    @PatchMapping("/{id}/upgrade/strength")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Upgrade pirate strength using exp")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate strength upgraded successfully"),
+            @ApiResponse(responseCode = "400", description = "Not enough exp or invalid amount"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto upgradeStrength(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id,
+            @Parameter(description = "Amount to upgrade") @RequestParam int amount
+    ) {
+        return pirateGamePlayService.upgradeStrength(id, amount);
+    }
+
+    @PatchMapping("/{id}/upgrade/rank")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Upgrade pirate rank using exp")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pirate rank upgraded successfully"),
+            @ApiResponse(responseCode = "400", description = "Not enough exp"),
+            @ApiResponse(responseCode = "404", description = "Pirate not found")
+    })
+    public PirateResponseDto upgradeLevel(
+            @Parameter(description = "Pirate UUID") @PathVariable UUID id
+    ) {
+        return pirateGamePlayService.upgradeLevel(id);
     }
 
 

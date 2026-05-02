@@ -28,4 +28,27 @@ public enum Rank {
     public boolean isHigherThan(Rank other) {
         return this.level > other.level;
     }
+
+    public Rank next() {
+        return fromLevel(this.level + 1, this);
+    }
+
+    public static Rank fromLevel(int level) {
+        return fromLevel(level, null);
+    }
+
+    private static Rank fromLevel(int level, Rank fallback) {
+        for (Rank rank : values()) {
+            if (rank.level == level) {
+                return rank;
+            }
+        }
+
+        if (fallback != null) {
+            return fallback;
+        }
+
+        throw new IllegalArgumentException("Rank with level " + level + " not found");
+    }
+
 }
