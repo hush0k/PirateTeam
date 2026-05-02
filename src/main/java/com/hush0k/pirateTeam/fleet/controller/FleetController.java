@@ -5,6 +5,8 @@ import com.hush0k.pirateTeam.fleet.dto.request.FleetMoveDto;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetResourceChangeDto;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetUpdateDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetAttackResult;
+import com.hush0k.pirateTeam.fleet.dto.response.FleetCaptureIsland;
+import com.hush0k.pirateTeam.fleet.dto.response.FleetFindTreasure;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetNewCoordinate;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetResponseDto;
 import com.hush0k.pirateTeam.fleet.dto.response.FleetStatsDto;
@@ -208,6 +210,34 @@ public class FleetController {
             @Parameter(description = "Enemy fleet UUID") @PathVariable UUID enemyFleetId
     ) {
         return fleetGameplayService.attackToEnemyFleet(fleetId, enemyFleetId);
+    }
+
+    @PostMapping("/{fleetId}/treasure/find")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Search treasure with fleet")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Treasure search completed"),
+            @ApiResponse(responseCode = "404", description = "Fleet or team not found")
+    })
+    public FleetFindTreasure findTreasure(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID fleetId
+    ) {
+        return fleetGameplayService.findTreasury(fleetId);
+    }
+
+    @PostMapping("/{fleetId}/capture/{islandId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Capture island with fleet")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Island capture completed"),
+            @ApiResponse(responseCode = "400", description = "Not enough ammo or island out of range"),
+            @ApiResponse(responseCode = "404", description = "Fleet, island, team, or pirate not found")
+    })
+    public FleetCaptureIsland captureIsland(
+            @Parameter(description = "Fleet UUID") @PathVariable UUID fleetId,
+            @Parameter(description = "Island UUID") @PathVariable UUID islandId
+    ) {
+        return fleetGameplayService.captureIsland(fleetId, islandId);
     }
 
 }

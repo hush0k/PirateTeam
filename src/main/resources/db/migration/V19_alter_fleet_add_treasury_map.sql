@@ -1,5 +1,0 @@
-ALTER TABLE fleet
-    ADD COLUMN has_treasury_map BOOLEAN DEFAULT FALSE;
-
-ALTER TABLE island
-    ADD COLUMN defense_power INT DEFAULT 300;

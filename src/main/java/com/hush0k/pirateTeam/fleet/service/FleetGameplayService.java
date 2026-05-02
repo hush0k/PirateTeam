@@ -229,7 +229,7 @@ public class FleetGameplayService {
 
         int treasury = calculateTreasury(result);
 
-        teamClientService.addTreasuryToTeam(team.id(), new TeamTreasuryCharacteristicClient(result));
+        teamClientService.addTreasuryToTeam(team.id(), new TeamTreasuryCharacteristicClient(treasury));
 
         team.pirateIds().forEach(pirateId -> {
             int amount = randomService.simpleRandom(3,6);
@@ -290,7 +290,7 @@ public class FleetGameplayService {
         fleet.setAmmo(fleet.getAmmo() - ammo);
 
         if (result >= 50) {
-            islandClientService.assignOwner(islandId, fleetId);
+            islandClientService.assignOwner(islandId, fleet.getOwnerId());
             pirateClientService.addReputationToPirate(fleet.getOwnerId(),
                     new TeamTreasuryCharacteristicClient(15 * island.level().getMaxAmmoToCapture()));
             teamClientService.addMoraleToTeam(team.id(),

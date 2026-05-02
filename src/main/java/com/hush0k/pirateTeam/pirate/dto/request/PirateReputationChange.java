@@ -1,10 +1,10 @@
 package com.hush0k.pirateTeam.pirate.dto.request;
 
-import jakarta.validation.constraints.Max;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.Positive;
 
 public record PirateReputationChange(
-        @Max(value = 100, message = "Репутация не может быть больше 100")
+        @JsonAlias("amount")
         @Positive(message = "Репутация должна быть положительным числом")
         int reputation
 ) {

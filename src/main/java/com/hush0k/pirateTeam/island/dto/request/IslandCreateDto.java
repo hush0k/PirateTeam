@@ -1,5 +1,6 @@
 package com.hush0k.pirateTeam.island.dto.request;
 
+import com.hush0k.pirateTeam.island.enums.DefenceType;
 import com.hush0k.pirateTeam.island.enums.IslandLevel;
 import com.hush0k.pirateTeam.island.enums.IslandLocation;
 import jakarta.validation.constraints.*;
@@ -25,24 +26,16 @@ public record IslandCreateDto(
         @NotNull(message = "Локация острова должна быть указана")
         IslandLocation location,
 
-        UUID ownerId,
-
-        @PositiveOrZero(message = "Население не может быть отрицательным")
-        int population,
-
         @PositiveOrZero(message = "Трафик кораблей не может быть отрицательным")
         int shipTrafficPerDay,
 
-        @PositiveOrZero(message = "Оборот золота не может быть отрицательным")
-        long goldTurnover,
+        DefenceType defenceType,
 
         @PositiveOrZero(message = "Налог не может быть отрицательным")
         @DecimalMax(value = "100.0", message = "Налог не может быть больше 100 процентов")
         double taxPercentage,
 
         @NotNull(message = "Уровень острова должен быть указан")
-        IslandLevel level,
-
-        Set<UUID> legendaryPirateIds
+        IslandLevel level
 
 ) {}

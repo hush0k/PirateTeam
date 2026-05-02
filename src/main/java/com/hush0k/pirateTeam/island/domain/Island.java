@@ -75,7 +75,9 @@ public class Island {
     @Builder.Default
     private Set<UUID> legendaryPirateIds = new HashSet<>();
 
-    @Column(name="defense_type")
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name="defense_type", columnDefinition = "defence_type_enum")
     private DefenceType  defenseType;
 
     @Column(name = "created_at")
@@ -95,6 +97,10 @@ public class Island {
 
         if (location == null) {
             location = IslandLocation.CARIBBEAN_SEA;
+        }
+
+        if (defenseType == null) {
+            defenseType = DefenceType.CROWD;
         }
     }
 
