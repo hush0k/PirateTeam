@@ -1,4 +1,4 @@
-.PHONY: build up dev down restart logs app-logs db-logs ps clean rebuild
+.PHONY: build up dev down restart logs app-logs frontend-logs db-logs kafka-logs ps clean rebuild
 
 build:
 	docker compose build
@@ -16,13 +16,19 @@ restart:
 	docker compose restart
 
 logs:
-	docker compose logs -f
+	docker compose logs -f app frontend postgres
 
 app-logs:
 	docker compose logs -f app
 
+frontend-logs:
+	docker compose logs -f frontend
+
 db-logs:
 	docker compose logs -f postgres
+
+kafka-logs:
+	docker compose logs -f kafka
 
 ps:
 	docker compose ps

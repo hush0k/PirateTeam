@@ -10,6 +10,8 @@ import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -27,6 +29,14 @@ public class Pirate {
 
     @Column(name="team_id")
     private UUID teamId;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "pirate_ships",
+            joinColumns = @JoinColumn(name = "pirate_id")
+    )
+    @Column(name = "ship_id")
+    private Set<UUID> shipIds = new HashSet<>();
 
     @Column(name="login", unique = true, nullable = false)
     private String login;
@@ -97,6 +107,10 @@ public class Pirate {
 
         if (country == null){
             country = Country.SPAIN;
+        }
+
+        if (freedom == null){
+            freedom = Freedom.FREE;
         }
     }
 

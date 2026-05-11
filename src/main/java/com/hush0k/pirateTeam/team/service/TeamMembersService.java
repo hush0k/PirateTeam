@@ -6,6 +6,7 @@ import com.hush0k.pirateTeam.exception.team.CannotRemoveCaptainException;
 import com.hush0k.pirateTeam.exception.team.PirateAlreadyInTeamException;
 import com.hush0k.pirateTeam.exception.team.PirateNotInTeamException;
 import com.hush0k.pirateTeam.exception.team.TeamNotFoundException;
+import com.hush0k.pirateTeam.kafka.TeamMemberChangedEvent;
 import com.hush0k.pirateTeam.pirate.enums.Freedom;
 import com.hush0k.pirateTeam.team.client.PirateFeignClient;
 import com.hush0k.pirateTeam.team.client.dto.CaptainClientDto;
@@ -14,6 +15,7 @@ import com.hush0k.pirateTeam.team.dto.request.TeamMembersChangeDto;
 import com.hush0k.pirateTeam.team.dto.response.CoupResultResponse;
 import com.hush0k.pirateTeam.team.dto.response.TeamResponseDto;
 import com.hush0k.pirateTeam.team.mapper.TeamMapper;
+import com.hush0k.pirateTeam.team.kafka.TeamKafkaProducer;
 import com.hush0k.pirateTeam.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ public class TeamMembersService {
     private final TeamMapper teamMapper;
     private final PirateFeignClient pirateFeignClient;
     private final RandomService randomService;
+    private final TeamKafkaProducer teamKafkaProducer;
 
 
     // Team membership operations
@@ -52,7 +55,7 @@ public class TeamMembersService {
         team.setPirateIds(pirateIds);
         Team updatedTeam = teamRepository.save(team);
 
-        pirateFeignClient.assignManyToTeam(id, dto.pirates());
+        teamKafkaProducer.sendTeamMembersChange(new TeamMemberChangedEvent(id, dto.pirates(), "ASSIGN"));
 
         log.info("Team with id: {} added new pirates successfully: {}", id, dto.pirates());
         return teamMapper.toTeamResponseDto(updatedTeam);
@@ -78,7 +81,7 @@ public class TeamMembersService {
         team.setPirateIds(pirateIds);
         Team updatedTeam = teamRepository.save(team);
 
-        pirateFeignClient.removeManyFromTeam(id, dto.pirates());
+        teamKafkaProducer.sendTeamMembersChange(new TeamMemberChangedEvent(id, dto.pirates(), "REMOVE"));
 
         log.info("Team with id: {} removed pirates successfully: {}", id, dto.pirates());
         return teamMapper.toTeamResponseDto(updatedTeam);
@@ -123,7 +126,7 @@ public class TeamMembersService {
             log.info("Coup succeeded for rebel {} in team {}. Result: {}", rebelId, teamId, result);
             team.setCapitanId(rebelId);
             team.getPirateIds().remove(captain.id());
-            pirateFeignClient.removeManyFromTeam(teamId, Set.of(captain.id()));
+            teamKafkaProducer.sendTeamMembersChange(new TeamMemberChangedEvent(teamId, Set.of(captain.id()), "REMOVE"));
             teamRepository.save(team);
             return new CoupResultResponse("success", result + "%", now);
         }

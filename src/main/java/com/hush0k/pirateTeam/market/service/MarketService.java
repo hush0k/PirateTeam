@@ -8,6 +8,8 @@ import com.hush0k.pirateTeam.exception.ship.ShipNotFoundException;
 import com.hush0k.pirateTeam.exception.ship.ShipUnavailableToSale;
 import com.hush0k.pirateTeam.exception.team.InsufficientTreasuryException;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetResourceChangeDto;
+import com.hush0k.pirateTeam.kafka.CapitanAssignedEvent;
+import com.hush0k.pirateTeam.kafka.CargoLoadedEvent;
 import com.hush0k.pirateTeam.market.client.FleetFeignClient;
 import com.hush0k.pirateTeam.market.client.PirateFeignClient;
 import com.hush0k.pirateTeam.market.client.ShipFeignClient;
@@ -18,11 +20,13 @@ import com.hush0k.pirateTeam.market.client.dto.FleetClientStatsDto;
 import com.hush0k.pirateTeam.market.client.dto.PirateClientDto;
 import com.hush0k.pirateTeam.market.client.dto.TeamClientDto;
 import com.hush0k.pirateTeam.market.dto.response.ReceiptDto;
+import com.hush0k.pirateTeam.market.kafka.MarketKafkaProducer;
 import com.hush0k.pirateTeam.pirate.dto.request.PirateTreasuryChangeDto;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
 import com.hush0k.pirateTeam.ship.domain.Ship;
 import com.hush0k.pirateTeam.ship.dto.response.ShipResponseDto;
 import com.hush0k.pirateTeam.ship.enums.ShipOwnership;
+import com.hush0k.pirateTeam.ship.kafka.ShipKafkaProducer;
 import com.hush0k.pirateTeam.ship.mapper.ShipMapper;
 import com.hush0k.pirateTeam.ship.repository.ShipRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +49,8 @@ public class MarketService {
     private final PirateFeignClient pirateFeignClient;
     private final ShipRepository shipRepository;
     private final ShipMapper shipMapper;
+    private final MarketKafkaProducer marketKafkaProducer;
+    private final ShipKafkaProducer shipKafkaProducer;
 
     @Transactional(readOnly = true)
     private Ship getExistingShip(UUID id) {
@@ -70,7 +76,7 @@ public class MarketService {
 
         fleetFeignClient.addAmmo(fleetId, new FleetResourceChangeDto(quantity));
 
-        shipFeignClient.loadCargo(fleetId, quantity * 5);
+        marketKafkaProducer.sendCargoLoaded(new CargoLoadedEvent(fleetId, quantity * 5));
 
         return new ReceiptDto("боеприпасы", quantity, totalPrice, true);
     }
@@ -94,7 +100,7 @@ public class MarketService {
 
         fleetFeignClient.addProvision(fleetId, new FleetResourceChangeDto(quantity));
 
-        shipFeignClient.loadCargo(fleetId, quantity * 10);
+        marketKafkaProducer.sendCargoLoaded(new CargoLoadedEvent(fleetId, quantity * 10));
 
         return new ReceiptDto("провизия", quantity, totalPrice, true);
     }
@@ -138,6 +144,7 @@ public class MarketService {
         ship.setOwnerId(captainId);
         ship.setOwnership(ShipOwnership.OWNED);
         Ship updatedShip = shipRepository.save(ship);
+        shipKafkaProducer.sendCaptainAssigned(new CapitanAssignedEvent(updatedShip.getId(), captainId));
         log.info("Корабль с ID: {} успешно продан", updatedShip.getId());
         return shipMapper.toShipDto(updatedShip);
     }

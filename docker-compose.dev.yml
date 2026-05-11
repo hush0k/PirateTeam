@@ -1,4 +1,18 @@
 services:
+  frontend:
+    image: node:24-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 80"
+    environment:
+      VITE_BACKEND_URL: http://app:8080
+    depends_on:
+      - app
+    networks:
+      - pirate-net
+
   app:
     image: maven:3.9-eclipse-temurin-21
     working_dir: /app
@@ -13,6 +27,14 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      LOGGING_LEVEL_ORG_APACHE_KAFKA: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_KAFKA: WARN
+      LOGGING_LEVEL_ORG_APACHE_KAFKA_CLIENTS_ADMIN_KAFKAADMINCLIENT: ERROR
+      LOGGING_LEVEL_ORG_HIBERNATE_SQL: WARN
+      LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER: WARN
+      LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND: WARN
+      LOGGING_LEVEL_ROOT: WARN
+      SPRING_MAIN_BANNER_MODE: "off"
     depends_on:
       postgres:
         condition: service_healthy
@@ -23,6 +45,7 @@ services:
 
 volumes:
   maven_cache:
+  frontend_node_modules:
 
 networks:
   pirate-net:

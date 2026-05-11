@@ -11,5 +11,6 @@ public record CaptainClientDto(
         String lastName,
         Rank rank,
         int reputation,
+        int intelligence,
         Freedom freedom
 ) {}

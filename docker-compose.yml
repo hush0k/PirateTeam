@@ -1,6 +1,12 @@
 services:
   postgres:
     image: postgres:16
+    entrypoint: ["sh", "-c", "exec docker-entrypoint.sh postgres -c log_min_messages=warning >/tmp/postgres.log 2>&1"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2k"
+        max-file: "1"
     environment:
       POSTGRES_DB: pirate_team
       POSTGRES_USER: user
@@ -18,23 +24,45 @@ services:
       - pirate-net
 
   kafka:
-    image: bitnami/kafka:3.7
+    image: confluentinc/cp-kafka:7.6.0
+    command: ["sh", "-c", "/etc/confluent/docker/run >/tmp/kafka.log 2>&1"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2k"
+        max-file: "1"
     ports:
       - "9094:9094"
     environment:
-      - KAFKA_CFG_NODE_ID=0
-      - KAFKA_CFG_PROCESS_ROLES=controller,broker
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
-      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
-      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
-      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_TOOLS_LOG4J_LOGLEVEL: WARN
+      KAFKA_LOG4J_LOGGERS: kafka=WARN,kafka.controller=WARN,kafka.server=WARN,kafka.log=WARN,state.change.logger=WARN,org.apache.kafka=WARN
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
     networks:
       - pirate-net
 
   app:
     build: .
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "8k"
+        max-file: "1"
     ports:
       - "8080:8080"
     environment:
@@ -42,9 +70,34 @@ services:
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      LOGGING_LEVEL_ORG_APACHE_KAFKA: WARN
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_KAFKA: WARN
+      LOGGING_LEVEL_ORG_APACHE_KAFKA_CLIENTS_ADMIN_KAFKAADMINCLIENT: ERROR
+      LOGGING_LEVEL_ORG_HIBERNATE_SQL: WARN
+      LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER: WARN
+      LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND: WARN
+      LOGGING_LEVEL_ROOT: WARN
+      SPRING_MAIN_BANNER_MODE: "off"
     depends_on:
       postgres:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - pirate-net
+
+  frontend:
+    build:
+      context: ./frontend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2k"
+        max-file: "1"
+    ports:
+      - "3000:80"
+    depends_on:
+      - app
     networks:
       - pirate-net
 

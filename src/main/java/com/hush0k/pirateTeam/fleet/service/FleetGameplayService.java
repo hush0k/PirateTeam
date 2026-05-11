@@ -14,7 +14,9 @@ import com.hush0k.pirateTeam.fleet.client.dto.TeamTreasuryCharacteristicClient;
 import com.hush0k.pirateTeam.fleet.domain.Fleet;
 import com.hush0k.pirateTeam.fleet.dto.request.FleetMoveDto;
 import com.hush0k.pirateTeam.fleet.dto.response.*;
+import com.hush0k.pirateTeam.fleet.kafka.FleetKafkaProducer;
 import com.hush0k.pirateTeam.fleet.repository.FleetRepository;
+import com.hush0k.pirateTeam.kafka.PirateStatChangedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ public class FleetGameplayService {
     private final TeamClientService teamClientService;
     private final PirateClientService pirateClientService;
     private final IslandClientService islandClientService;
+    private final FleetKafkaProducer fleetKafkaProducer;
 
     public int calculateDistance(int x1, int y1, int x2, int y2) {
         return (int) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
@@ -47,7 +50,7 @@ public class FleetGameplayService {
         TeamDto team = teamClientService.getByFleetId(fleetId);
         int teamSize = team.pirateIds().size();
 
-        int spentProvision = (int)(teamSize * 0.5 * distance);
+        int spentProvision = (int)(teamSize * 0.2 * distance);
 
         if (spentProvision > fleet.getProvision()) {
             throw new InsufficientProvisionException(fleetId);
@@ -148,18 +151,18 @@ public class FleetGameplayService {
 
             myTeam.pirateIds().forEach(pirateId -> {
                 int amount = randomService.simpleRandom(3,10);
-                pirateClientService.addReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+                sendPirateStatChange(pirateId, "REP_ADD", amount);
             });
             addExpToReputablePirates(myTeam.pirateIds(), 7, 17);
 
             enemyTeam.pirateIds().forEach(pirateId -> {
                 int amount = randomService.simpleRandom(3,10);
-                pirateClientService.removeReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+                sendPirateStatChange(pirateId, "REP_REMOVE", amount);
             });
 
             enemyTeam.pirateIds().forEach(pirateId -> {
                 int amount = randomService.simpleRandom(3,6);
-                pirateClientService.removeReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+                sendPirateStatChange(pirateId, "REP_REMOVE", amount);
             });
 
         } else if (result < 50) {
@@ -181,18 +184,18 @@ public class FleetGameplayService {
 
             enemyTeam.pirateIds().forEach(pirateId -> {
                 int amount = randomService.simpleRandom(3,10);
-                pirateClientService.addReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+                sendPirateStatChange(pirateId, "REP_ADD", amount);
             });
 
             myTeam.pirateIds().forEach(pirateId -> {
                 int amount = randomService.simpleRandom(3,6);
-                pirateClientService.removeReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+                sendPirateStatChange(pirateId, "REP_REMOVE", amount);
             });
 
 
             myTeam.pirateIds().forEach(pirateId -> {
                 int amount = randomService.simpleRandom(3,10);
-                pirateClientService.removeReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+                sendPirateStatChange(pirateId, "REP_REMOVE", amount);
             });
 
         } else {
@@ -233,7 +236,7 @@ public class FleetGameplayService {
 
         team.pirateIds().forEach(pirateId -> {
             int amount = randomService.simpleRandom(3,6);
-            pirateClientService.addReputationToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+            sendPirateStatChange(pirateId, "REP_ADD", amount);
         });
 
         if (treasury > 0) {
@@ -291,29 +294,25 @@ public class FleetGameplayService {
 
         if (result >= 50) {
             islandClientService.assignOwner(islandId, fleet.getOwnerId());
-            pirateClientService.addReputationToPirate(fleet.getOwnerId(),
-                    new TeamTreasuryCharacteristicClient(15 * island.level().getMaxAmmoToCapture()));
+            sendPirateStatChange(fleet.getOwnerId(), "REP_ADD", 15 * island.level().getMaxAmmoToCapture());
             teamClientService.addMoraleToTeam(team.id(),
                     new TeamTreasuryCharacteristicClient(randomService.simpleRandom(5, 13)));
             teamClientService.addLoyaltyToTeam(team.id(),
                     new TeamTreasuryCharacteristicClient(randomService.simpleRandom(8, 15)));
 
             team.pirateIds().forEach(pirateId -> {
-                pirateClientService.addReputationToPirate(pirateId,
-                        new TeamTreasuryCharacteristicClient(randomService.simpleRandom(9, 13)));
+                sendPirateStatChange(pirateId, "REP_ADD", randomService.simpleRandom(9, 13));
             });
             addExpToReputablePirates(team.pirateIds(), 20, 28);
         } else {
-            pirateClientService.removeReputationToPirate(fleet.getOwnerId(),
-                    new TeamTreasuryCharacteristicClient(15 * island.level().getMaxAmmoToCapture()));
+            sendPirateStatChange(fleet.getOwnerId(), "REP_REMOVE", 15 * island.level().getMaxAmmoToCapture());
             teamClientService.withdrawMoraleToTeam(team.id(),
                     new TeamTreasuryCharacteristicClient(randomService.simpleRandom(5, 13)));
             teamClientService.withdrawLoyaltyToTeam(team.id(),
                     new TeamTreasuryCharacteristicClient(randomService.simpleRandom(8, 15)));
 
             team.pirateIds().forEach(pirateId -> {
-                pirateClientService.removeReputationToPirate(pirateId,
-                        new TeamTreasuryCharacteristicClient(randomService.simpleRandom(5, 8)));
+                sendPirateStatChange(pirateId, "REP_REMOVE", randomService.simpleRandom(5, 8));
             });
         }
 
@@ -342,8 +341,12 @@ public class FleetGameplayService {
             PirateClientDto pirate = pirateClientService.getPirate(pirateId);
             if (pirate.reputation() > 0) {
                 int amount = randomService.simpleRandom(minAmount, maxAmount);
-                pirateClientService.addExpToPirate(pirateId, new TeamTreasuryCharacteristicClient(amount));
+                sendPirateStatChange(pirateId, "EXP_ADD", amount);
             }
         });
+    }
+
+    private void sendPirateStatChange(UUID pirateId, String statType, int amount) {
+        fleetKafkaProducer.sendPirateStatChange(new PirateStatChangedEvent(pirateId, statType, amount));
     }
 }

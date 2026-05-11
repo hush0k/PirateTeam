@@ -1,5 +1,6 @@
 package com.hush0k.pirateTeam.team.service;
 
+import com.hush0k.pirateTeam.kafka.TeamMemberChangedEvent;
 import com.hush0k.pirateTeam.exception.pirate.PirateInvalidRankException;
 import com.hush0k.pirateTeam.exception.team.*;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
@@ -10,6 +11,7 @@ import com.hush0k.pirateTeam.team.dto.request.*;
 import com.hush0k.pirateTeam.team.dto.response.TeamResponseDto;
 import com.hush0k.pirateTeam.team.mapper.TeamMapper;
 import com.hush0k.pirateTeam.team.repository.TeamRepository;
+import com.hush0k.pirateTeam.team.kafka.TeamKafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final TeamMapper teamMapper;
     private final PirateFeignClient pirateFeignClient;
+    private final TeamKafkaProducer teamKafkaProducer;
 
     // Basic CRUD operations
     public TeamResponseDto create(TeamCreateDto dto) {
@@ -48,7 +51,7 @@ public class TeamService {
 
         Team savedTeam = teamRepository.save(team);
 
-        pirateFeignClient.assignManyToTeam(savedTeam.getId(), Set.of(dto.capitanId()));
+        teamKafkaProducer.sendTeamMembersChange(new TeamMemberChangedEvent(savedTeam.getId(), Set.of(dto.capitanId()), "ASSIGN"));
 
         log.info("Team created successfully with id: {}", savedTeam.getId());
         return teamMapper.toTeamResponseDto(savedTeam);

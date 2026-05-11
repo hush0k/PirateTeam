@@ -7,7 +7,9 @@ import com.hush0k.pirateTeam.pirate.enums.Freedom;
 import com.hush0k.pirateTeam.pirate.repository.PirateRepository;
 import com.hush0k.pirateTeam.team.dto.request.*;
 import com.hush0k.pirateTeam.team.dto.response.CoupResultResponse;
+import com.hush0k.pirateTeam.team.dto.response.ShipSearchResultResponse;
 import com.hush0k.pirateTeam.team.dto.response.TeamResponseDto;
+import com.hush0k.pirateTeam.team.service.TeamGameplayService;
 import com.hush0k.pirateTeam.team.service.TeamMembersService;
 import com.hush0k.pirateTeam.team.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +36,7 @@ public class TeamController {
 
     private final TeamService teamService;
     private final TeamMembersService teamMembersService;
+    private final TeamGameplayService teamGameplayService;
     private final JwtService jwtService;
     private final PirateRepository pirateRepository;
 
@@ -249,6 +252,19 @@ public class TeamController {
             @Parameter(description = "Rebel pirate UUID") @PathVariable UUID rebelId
     ) {
         return teamMembersService.startCoup(rebelId, id);
+    }
+
+    @PostMapping("/{id}/find-abandoned-ship")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Try to find an abandoned ship for the team")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Ship search completed"),
+            @ApiResponse(responseCode = "404", description = "Team or captain not found")
+    })
+    public ShipSearchResultResponse findAbandonedShip(
+            @Parameter(description = "Team UUID") @PathVariable UUID id
+    ) {
+        return teamGameplayService.findAbandonedShip(id);
     }
 
     private UUID getCurrentPirateId(HttpServletRequest request) {

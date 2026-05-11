@@ -1,5 +1,6 @@
 package com.hush0k.pirateTeam.ship.service;
 
+import com.hush0k.pirateTeam.kafka.CapitanAssignedEvent;
 import com.hush0k.pirateTeam.exception.pirate.PirateNotCaptainException;
 import com.hush0k.pirateTeam.pirate.enums.Rank;
 import com.hush0k.pirateTeam.ship.client.PirateFeignClient;
@@ -12,6 +13,7 @@ import com.hush0k.pirateTeam.ship.dto.response.ShipResponseDto;
 import com.hush0k.pirateTeam.ship.mapper.ShipMapper;
 import com.hush0k.pirateTeam.ship.repository.ShipRepository;
 import com.hush0k.pirateTeam.exception.ship.ShipNotFoundException;
+import com.hush0k.pirateTeam.ship.kafka.ShipKafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class ShipService {
     private final ShipRepository shipRepository;
     private final ShipMapper shipMapper;
     private final PirateFeignClient pirateFeignClient;
+    private final ShipKafkaProducer shipKafkaProducer;
 
     @Transactional(readOnly = true)
     private Ship getExisting(UUID id) {
@@ -60,6 +63,7 @@ public class ShipService {
         Ship ship = getExisting(shipId);
         ship.setCapitanId(captainId);
         Ship savedShip = shipRepository.save(ship);
+        shipKafkaProducer.sendCaptainAssigned(new CapitanAssignedEvent(savedShip.getId(), captainId));
 
         return shipMapper.toShipDto(savedShip);
     }

@@ -115,6 +115,13 @@ public class PirateService {
         log.info("Assigned {} pirates to team {} successfully", pirates.size(), teamId);
     }
 
+    public void assignShip(UUID pirateId, UUID shipId) {
+        Pirate pirate = getExisting(pirateId);
+        pirate.getShipIds().add(shipId);
+        pirateRepository.save(pirate);
+        log.info("Assigned ship {} to pirate {} successfully", shipId, pirateId);
+    }
+
     public void removeManyFromTeam(Set<UUID> pirateIds, UUID teamId){
         log.info("Removing {} pirates from team {}", pirateIds.size(), teamId);
         List<Pirate> pirates = pirateRepository.findAllById(pirateIds);
@@ -221,5 +228,6 @@ public class PirateService {
     private int capCharacteristic(int value) {
         return Math.min(MAX_CHARACTERISTIC_VALUE, value);
     }
+
 
 }
